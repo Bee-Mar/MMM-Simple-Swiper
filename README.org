@@ -27,6 +27,8 @@ This module has three dependencies, all of which are listed below in the table. 
    | electron-rebuild | https://github.com/electron/electron-rebuild |
 
 
+** Installation
+The installation process for our module is extremely simple. First, clone this repo within the =modules= folder of the MagicMirror directory, and run =make=. As mentioned within the =Dependencies= section, everything required for the module will be automatically downloaded, and installed. Then, simply copy and paste the example config (below) into your MagicMirror's =config.js= file, and you'll be good to go. As an aside, please do your best to briefly read all the sections in this README for important details about how far some of the values may be tweaked, and how to incorporate our module with =MMM-pages=.
 
 ** SuDON'T
 
@@ -92,6 +94,7 @@ modules: [
     }
 ]
 #+END_SRC
+
 
 ** Tested Conditions/Warning
 This has only been tested on the RaspberryPi 3 using Debian 9 Stretch, using two HC-SR04 ultra sonic sensors. This module was intended to be run along side =MMM-pages= and =MMM-page-indicator=, and has done so very well in our testing. Also, since the C executable outputs raw values from the sensors, if you wanted to take the code and utilize in another project, please, feel free. In fact, you're encouraged to do so.

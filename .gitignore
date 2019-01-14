@@ -1,0 +1,7 @@
+node_modules
+.tern-project
+.tern-port
+.clang_complete
+wiringPi
+main
+package-lock.json

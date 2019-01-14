@@ -3,7 +3,7 @@
 #+STARTUP: showall
 #+OPTIONS: toc:nil
 
-* MMM-simple-swiper
+* MMM-Simple-Swiper
 | Author          | Contact             |
 | Brandon Marlowe | bpmarlowe@gmail.com |
 | Otto Juba       | ottojuba@gmail.com  |
@@ -11,12 +11,12 @@
 ** What is this, and why did we make this module?
 When setting up our MagicMirrors, we wanted to use two HC-SR04 ultra sonic sensors to detect motion, so we could change the currently displayed page, and feel like wizards who commanded technology using mystical powers (bad joke, I know). When searching through the modules available on the MagicMirror wiki, we found a couple of pre-existing modules built to do just that, but none of them worked. So, we searched online for answers, and found many people having the same issue with the very same modules, and decided to make our own.
 
-This module attempts to determine distance/motion based on the output from the sensors in a simple, efficient manner. When the =MMM-simple-swiper= modules loads, it sends a socket notification to =node_helper.js=. The =node_helper= then creates a child process, which calls a C executable, and supplies the JSON config as a command line argument in string format. The JSON string is parsed, the values are stored in structs, and an infinite loop is entered. Within the inifinte loop, two threads are created to collect the distance measurements, remove the outliers, and calculate the average distance. The two threads are joined, and the averages are printed to =stdout= in a =[FLOAT]:[FLOAT]= format, which is read by the child process created in =node_helper.js=. From here, the values are checked to see if both within a certain threshold. If the values meet this criteria and there is a large enough difference between the two values, a socket nofication is sent to the =MMM-simple-swiper= module, which sends a notification to the =MMM-pages= module.
+This module attempts to determine distance/motion based on the output from the sensors in a simple, efficient manner. When the =MMM-Simple-Swiper= modules loads, it sends a socket notification to =node_helper.js=. The =node_helper= then creates a child process, which calls a C executable, and supplies the JSON config as a command line argument in string format. The JSON string is parsed, the values are stored in structs, and an infinite loop is entered. Within the inifinte loop, two threads are created to collect the distance measurements, remove the outliers, and calculate the average distance. The two threads are joined, and the averages are printed to =stdout= in a =[FLOAT]:[FLOAT]= format, which is read by the child process created in =node_helper.js=. From here, the values are checked to see if both within a certain threshold. If the values meet this criteria and there is a large enough difference between the two values, a socket nofication is sent to the =MMM-Simple-Swiper= module, which sends a notification to the =MMM-pages= module.
 
 The overwhelming majority of the work is done on the C-side (get it? It's a pun. "Bazinga" - Sheldon Cooper) of things to keep it fast and efficient. Also, we tried to keep it as lightweight as possible (267 lines of code...including the Makefile), so the code is (hopefully) pretty straightforward.
 
 ** Dependencies
-This module has three dependencies, all of which are listed below in the table. Now, you could go ahead and clone the repos, and install the libraries yourself, OOORRR you could be lazy and just let the Makefile in this module take care of that for you. When you clone this repo, and run =make=, the =wiringPi= libary is used as a dependency of the =main= target. Because of this, a small =if= statement checks to see if the libarary is installed. If it's not, it will clone, build, and install the library for you (aren't we nice?!). Just as a warning, the build process (as noted by the creator of =wiringPi=) does use =sudo= permissions without prompting you. Also, the two NodeJS libraries will be automagically installed by the =Makefile=...again, you are soooo welcome. 
+This module has three dependencies, all of which are listed below in the table. Now, you could go ahead and clone the repos, and install the libraries yourself, OOORRR you could be lazy and just let the Makefile in this module take care of that for you. When you clone this repo, and run =make=, the =wiringPi= libary is used as a dependency of the =main= target. Because of this, a small =if= statement checks to see if the libarary is installed. If it's not, it will clone, build, and install the library for you (aren't we nice?!). Just as a warning, the build process (as noted by the creator of =wiringPi=) does use =sudo= permissions without prompting you. Also, the two NodeJS libraries will be automagically installed by the =Makefile=...again, you are soooo welcome.
 
 (I certainly hope you're picking up on our sarcastic demeanors by this point.)
 
@@ -56,7 +56,7 @@ section below.
 #+BEGIN_SRC js
 // other module configs ...
 
-   module: "MMM-simple-swiper",
+   module: "MMM-Simple-Swiper",
    disabled: false,
    config: {
        echoLeftPin: 24, // GPIO #
@@ -73,7 +73,7 @@ section below.
 #+END_SRC
 
 ** MMM-pages
-When using with =MMM-pages=, place =MMM-simple-swiper= within the =excludes= section. For the life of us, we still don't understand why the =excludes= section is the list of modules which are fixed in place. All we're saying is that if something is constant, or fixed, it should be called, I don't know, =constant=, or =fixed= rather than =excludes=...but we didn't make the =MMM-pages= module, so who are we to decide.
+When using with =MMM-pages=, place =MMM-Simple-Swiper= within the =excludes= section. For the life of us, we still don't understand why the =excludes= section is the list of modules which are fixed in place. All we're saying is that if something is constant, or fixed, it should be called, I don't know, =constant=, or =fixed= rather than =excludes=...but we didn't make the =MMM-pages= module, so who are we to decide.
 
 Just so it's more clear, here's the example config taken from the =MMM-pages= Github, with our module tucked nicely inside the fix...we mean =excludes= section.
 
@@ -86,8 +86,8 @@ modules: [
                [ "weatherforecast", "newsfeed"],
                [ "calendar", "compliments" ]
             ],
-            
-            excludes: ["clock", "currentweather", "MMM-page-indicator", "MMM-simple-swiper"],
+
+            excludes: ["clock", "currentweather", "MMM-page-indicator", "MMM-Simple-Swiper"],
         }
     }
 ]
@@ -96,10 +96,8 @@ modules: [
 ** Tested Conditions/Warning
 This has only been tested on the RaspberryPi 3 using Debian 9 Stretch, using two HC-SR04 ultra sonic sensors. This module was intended to be run along side =MMM-pages= and =MMM-page-indicator=, and has done so very well in our testing. Also, since the C executable outputs raw values from the sensors, if you wanted to take the code and utilize in another project, please, feel free. In fact, you're encouraged to do so.
 
-Also, while messing around with the =delay= parameter of the config in the =MMM-simple-swiper= file, we did notice that anything less than 600 milliseconds can cause the entire module to hang after running for approximately 30 seconds. We haven't figured out exactly why, but I suspect it has to do with too much throughput, and child process not being able to read the data from stdout fast enough. 
+Also, while messing around with the =delay= parameter of the config in the =MMM-Simple-Swiper= file, we did notice that anything less than 600 milliseconds can cause the entire module to hang after running for approximately 30 seconds. We haven't figured out exactly why, but I suspect it has to do with too much throughput, and child process not being able to read the data from stdout fast enough.
 
 If you notice any bugs, please let us know, and we'll do our best to correct them. As it stands right now, this module performs how we intended, and do not plan doing anything beyond basic maintenance when absolutely necessary.
 
 Side note, I'm sure you noticed we abused the use of the special =tags=... =Well, we like how it looks=.
-
-

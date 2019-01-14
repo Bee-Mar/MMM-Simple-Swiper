@@ -1,0 +1,19 @@
+{
+  "name": "MMM-simple-swiper",
+  "version": "1.0.0",
+  "description": "We hope this works...",
+  "main": "MMM-simple-swiper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Brandon Marlowe & Otto Juba",
+  "license": "MIT",
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "electron-rebuild": "^1.8.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "//https://github.com/Bee-Mar/MMM-simple-swiper"
+  }
+}

@@ -104,3 +104,6 @@ Also, while messing around with the =delay= parameter of the config in the =MMM-
 If you notice any bugs, please let us know, and we'll do our best to correct them. As it stands right now, this module performs how we intended, and do not plan doing anything beyond basic maintenance when absolutely necessary.
 
 Side note, I'm sure you noticed we abused the use of the special =tags=... =Well, we like how it looks=.
+
+** Demonstration
+[[./videos/MMM-Simple-Swiper-demo.mp4]]

@@ -106,4 +106,4 @@ If you notice any bugs, please let us know, and we'll do our best to correct the
 Side note, I'm sure you noticed we abused the use of the special =tags=... =Well, we like how it looks=.
 
 ** Demonstration
-[[./videos/MMM-Simple-Swiper-demo.mp4]]
+[[./video/MMM-Simple-Swiper-demo.mp4]]

@@ -13,7 +13,7 @@ module.exports = NodeHelper.create({
     ]);
 
     // using arrow function to keep "this" reference of outer scope
-    child.stdout.on("data", data => {
+    child.stdout.on("data", (data) => {
       data = data
         .toString()
         .replace(/\s+/g, "")

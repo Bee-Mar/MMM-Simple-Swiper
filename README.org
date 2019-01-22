@@ -97,7 +97,7 @@ modules: [
 
 
 ** Tested Conditions/Warning
-This has only been tested on the RaspberryPi 3 using Debian 9 Stretch, using two HC-SR04 ultra sonic sensors. This module was intended to be run along side =MMM-pages= and =MMM-page-indicator=, and has done so very well in our testing. Also, since the C executable outputs raw values from the sensors, if you wanted to take the code and utilize in another project, please, feel free. In fact, you're encouraged to do so.
+This has only been tested on the RaspberryPi 3 B using Raspbian (based on Debian Stretch), using two HC-SR04 ultra sonic sensors. This module was intended to be run along side =MMM-pages= and =MMM-page-indicator=, and has done so very well in our testing. Also, since the C executable outputs raw values from the sensors, if you wanted to take the code and utilize in another project, please, feel free. In fact, you're encouraged to do so.
 
 Also, while messing around with the =delay= parameter of the config in the =MMM-Simple-Swiper= file, we did notice that anything less than 600 milliseconds can cause the entire module to hang after running for approximately 30 seconds. We haven't figured out exactly why, but I suspect it has to do with too much throughput, and child process not being able to read the data from stdout fast enough.
 

@@ -20,7 +20,7 @@ required_lib: main.c
 		printf "Installing NodeJS Dependencies\n";\
 		printf "==============================\n\n";\
 		npm install; \
-		printf "\n\nFinished installation.......biiiiitch\n\n";\
+		printf "\n\nFinished installation\n\n";\
 	fi
 
 clean:

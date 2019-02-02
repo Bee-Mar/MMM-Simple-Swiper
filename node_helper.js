@@ -8,7 +8,7 @@ module.exports = NodeHelper.create({
 
     // creating demon spawn
     var child = require("child_process").spawn("sudo", [
-      __dirname + "/main",
+      __dirname + "/swiper",
       JSON.stringify(payload),
     ]);
 

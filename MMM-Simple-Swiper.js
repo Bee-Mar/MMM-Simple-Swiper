@@ -1,6 +1,6 @@
 "use strict";
 
-Module.register("MMM-simple-swiper", {
+Module.register("MMM-Simple-Swiper", {
   // value must be given for each of the parameters
   defaults: {
     echoLeftPin: 24, // GPIO #

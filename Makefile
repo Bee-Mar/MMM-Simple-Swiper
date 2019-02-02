@@ -1,15 +1,22 @@
 LDFLAGS=-lpthread -lwiringPi
 CFLAGS=-g -o
-DEPENDS=main.c required_lib
 CC=gcc
 
-main: $(DEPENDS)
-	$(CC) -o main main.c $(LDFLAGS)
+swiper: swiper.c
+	@if [ ! -f /usr/local/include/wiringPi.h ]; then\
+		printf "wiringPi dependency not met. Please run 'make install'\n";\
+	else\
+		$(CC) -o swiper swiper.c $(LDFLAGS);\
+	fi
 
-debug: $(DEPENDS)
-	$(CC) $(CFLAGS) main main.c $(LDFLAGS) -DEBUG
+debug: swiper.c
+	@if [ ! -f /usr/local/include/wiringPi.h ]; then\
+		printf "\nwiringPi dependency not met. Please run 'make install'\n";\
+	else\
+		$(CC) $(CFLAGS) swiper swiper.c $(LDFLAGS) -DEBUG;\
+	fi
 
-required_lib: main.c
+install: swiper.c
 	@if [ ! -f /usr/local/include/wiringPi.h ]; then\
 		printf "\n==========================\n";\
 		printf "Getting WiringPi Dependency\n";\
@@ -21,7 +28,11 @@ required_lib: main.c
 		printf "==============================\n\n";\
 		npm install; \
 		printf "\n\nFinished installation\n\n";\
+	else\
+		printf "\nwiringPi library already exists in /usr/local/include/\n";\
+		printf "\nRunning npm install...\n";\
+		npm install;\
 	fi
 
 clean:
-	rm -rf main main.o
+	rm -rf swiper swiper.o

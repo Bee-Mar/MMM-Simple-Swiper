@@ -16,7 +16,7 @@ This module attempts to determine distance/motion based on the output from the s
 The overwhelming majority of the work is done on the C-side (get it? It's a pun. "Bazinga" - Sheldon Cooper) of things to keep it fast and efficient. Also, we tried to keep it as lightweight as possible (267 lines of code...including the Makefile), so the code is (hopefully) pretty straightforward.
 
 ** Dependencies
-This module has three dependencies, all of which are listed below in the table. Now, you could go ahead and clone the repos, and install the libraries yourself, OOORRR you could be lazy and just let the Makefile in this module take care of that for you. When you clone this repo, and run =make=, the =wiringPi= libary is used as a dependency of the =main= target. Because of this, a small =if= statement checks to see if the libarary is installed. If it's not, it will clone, build, and install the library for you (aren't we nice?!). Just as a warning, the build process (as noted by the creator of =wiringPi=) does use =sudo= permissions without prompting you. Also, the two NodeJS libraries will be automagically installed by the =Makefile=...again, you are soooo welcome.
+This module has three dependencies, all of which are listed below in the table. Now, you could go ahead and clone the repos, and install the libraries yourself, OOORRR you could be lazy and just let the Makefile in this module take care of that for you. When you clone this repo, and run =make=, the =wiringPi= libary is used as a dependency of the =swiper= target. Because of this, a small =if= statement checks to see if the libarary is installed. If it's not, it will clone, build, and install the library for you (aren't we nice?!). Just as a warning, the build process (as noted by the creator of =wiringPi=) does use =sudo= permissions without prompting you. Also, the two NodeJS libraries will be automagically installed by the =Makefile=...again, you are soooo welcome.
 
 (I certainly hope you're picking up on our sarcastic demeanors by this point.)
 
@@ -28,7 +28,7 @@ This module has three dependencies, all of which are listed below in the table. 
 
 
 ** Installation
-The installation process for our module is extremely simple. First, clone this repo within the =modules= folder of the MagicMirror directory, and run =make=. As mentioned within the =Dependencies= section, everything required for the module will be automatically downloaded, and installed. Then, simply copy and paste the example config (below) into your MagicMirror's =config.js= file, and you'll be good to go. As an aside, please do your best to briefly read all the sections in this README for important details about how far some of the values may be tweaked, and how to incorporate our module with =MMM-pages=.
+The installation process for our module is extremely simple. First, clone this repo within the =modules= folder of the MagicMirror directory, and run =make install= to install the necessary libraries. Next, run =make= to compile the executable. That’s all! You’re ready to go. As mentioned within the =Dependencies= section, everything required for the module will be automatically downloaded, and installed. Then, simply copy and paste the example config (below) into your MagicMirror's =config.js= file, and you'll be good to go. As an aside, please do your best to briefly read all the sections in this README for important details about how far some of the values may be tweaked, and how to incorporate our module with =MMM-pages=. Additionally, within the =step-by-step-instructions= folder, there is a detailed document, and video detailing an installation from top to bottom of MagicMirror and our module.
 
 ** SuDON'T
 
@@ -40,7 +40,7 @@ When running this module, there is absolutely no need to execute =sudo= with =np
 ...
 
 var child = require("child_process").spawn("sudo", [
-   __dirname + "/main",
+   __dirname + "/swiper",
    JSON.stringify(payload),
 ]);
 

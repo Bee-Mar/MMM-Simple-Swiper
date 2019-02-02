@@ -65,6 +65,14 @@ var child = require("child_process").spawn("sudo", [
 Notice the first argument of the =spawn= function being =sudo=, which takes care of the
 permissions required for the GPIO pins. We show you this in an attempt to be transparent, and asure you no funny business is taking place.
 
+** Raspberry Pi Pin Layout Reference
+   [[./images/raspberry_pi_circuit_note_fig2a.jpg]]
+   * Source: https://www.jameco.com/Jameco/workshop/circuitnotes/raspberry_pi_circuit_note_fig2a.jpg
+     
+** Wiring the Sensors
+   [[./images/hcsr04.png
+   * Source: https://github.com/mochman/MMM-Swipe (shamelessly lifted from the module that doesn’t work)
+   ]]
 ** Config
 The default config is shown below, and the order in which the values are listed are not important.
 Feel free to tweak the values to your needs. Also, please read the =Tested Conditions/Warning=
@@ -121,11 +129,12 @@ If you notice any bugs, please let us know, and we'll do our best to correct the
 Side note, I'm sure you noticed we abused the use of the special =tags=... =Well, we like how it looks=.
 
 * Performance Demonstration
-[[./video/MMM-Simple-Swiper-demo.mp4]]
+[[./videos/MMM-Simple-Swiper-Demo.mp4]]
 
 * Step-By-Step Instructions
 ** Screencasted Video of Installation
-   
+   [[./videos/MMM-Simple-Swiper-Installation.mp4
+]]
 ** Before getting started...
 
   1) The demo installation was done on a _Raspberry Pi 3 B_ running Raspbian
@@ -149,13 +158,11 @@ Side note, I'm sure you noticed we abused the use of the special =tags=... =Well
 
   4) There were no steps skipped throughout the video
 
-  5) An image of the pin connections for the HC-SR04 Sensors is our GitHub page
+  5) Instructions for the =Required Packages= are from the relevant Github pages
 
-  6) Instructions for the =Required Packages= are from the relevant Github pages
+  6) The Required Packages are the _BARE MINIMUM_ to get this working
 
-  7) The Required Packages are the _BARE MINIMUM_ to get this working
-
-  8) _NOTE_: Within the =Basic config.js containing required modules=
+  7) _NOTE_: Within the =Basic config.js containing required modules=
      * There are default modules, which can be removed, if desired (see comments within file)
 
 

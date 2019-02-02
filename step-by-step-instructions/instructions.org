@@ -102,15 +102,16 @@
      cp step-by-step-instructions/SAMPLE_CONFIG.js ~/MagicMirror/config/
      # otherwise, simply examine the file, and see what is required
 
-     # installing dependencies retrieval
+     # installing dependencies
      make install
 
      # compile executable
      make
 
-     # OPTIONAL: To test the module, use this as input
+     # OPTIONAL: To test the module, follow below
+     cd ~/MagicMirror/modules/MMM-Simple-Swiper/
      make debug
-     sudo ./main "{echoLeftPin: 24, triggerLeftPin: 23, echoRightPin: 26, triggerRightPin: 25, threshold: 175, distanceDiff: 1.25, debug: false, delay: 750, }"
+     sudo ./swiper "{echoLeftPin: 24, triggerLeftPin: 23, echoRightPin: 26, triggerRightPin: 25, threshold: 175, distanceDiff: 1.25, debug: false, delay: 750, }"
      
      # to see if the module is running, run this in a terminal
      ps -ef | egrep -i "sudo\s+.*./MMM-Simple-Swiper/swiper"

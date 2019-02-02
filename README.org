@@ -71,7 +71,7 @@ permissions required for the GPIO pins. We show you this in an attempt to be tra
      
 ** Wiring the Sensors
    [[./images/hcsr04.png
-   * Source: https://github.com/mochman/MMM-Swipe (shamelessly lifted from the module that doesn’t work)
+   * Source: https://github.com/mochman/MMM-Swipe (shamelessly lifted from MMM-Swipe)
    ]]
 ** Config
 The default config is shown below, and the order in which the values are listed are not important.

@@ -120,7 +120,7 @@
    #+END_SRC
 
 
-* Basic, Required MagicMirror config.js
+* Basic config.js that contains setup of required modules
   #+BEGIN_SRC js
     /* Magic Mirror Config Sample
      ,*

@@ -75,7 +75,7 @@ permissions required for the GPIO pins. We show you this in an attempt to be tra
    
 ** How we wired ours
    [[./images/MMM-Simple-Swiper-Pin-Layout.jpg]]
-   _IMPORTANT:_ Do not forget to add a resistor to the Echo wire. Refer to the diagram above.
+   * _IMPORTANT:_ Do not forget to add a resistor to the Echo wire. Refer to the diagram above.
 
 ** Config
 The default config is shown below, and the order in which the values are listed are not important.

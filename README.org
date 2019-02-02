@@ -220,7 +220,7 @@ Side note, I'm sure you noticed we abused the use of the special =tags=... =Well
      cd ~/MagicMirror/modules/MMM-Simple-Swiper
 
      # ONLY DO THIS IF YOU DON’T ALREADY HAVE A CONFIG SETUP
-     cp sample-config-file/SAMPLE_CONFIG.js ~/MagicMirror/config/
+     cp sample-config-file/SAMPLE_CONFIG.js ~/MagicMirror/config/config.js
      # otherwise, simply examine the file, and see what is required
 
      # installing dependencies and compile executable

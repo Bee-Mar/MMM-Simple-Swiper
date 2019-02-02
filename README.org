@@ -70,9 +70,8 @@ permissions required for the GPIO pins. We show you this in an attempt to be tra
    * Source: https://www.jameco.com/Jameco/workshop/circuitnotes/raspberry_pi_circuit_note_fig2a.jpg
      
 ** Wiring the Sensors
-   [[./images/hcsr04.png
-   * Source: https://github.com/mochman/MMM-Swipe (shamelessly lifted from MMM-Swipe)
-   ]]
+   [[./images/hcsr04.png]]
+   * Source: https://github.com/mochman/MMM-Swipe (shamelessly lifted)
 ** Config
 The default config is shown below, and the order in which the values are listed are not important.
 Feel free to tweak the values to your needs. Also, please read the =Tested Conditions/Warning=
@@ -133,8 +132,7 @@ Side note, I'm sure you noticed we abused the use of the special =tags=... =Well
 
 * Step-By-Step Instructions
 ** Screencasted Video of Installation
-   [[./videos/MMM-Simple-Swiper-Installation.mp4
-]]
+   [[./videos/MMM-Simple-Swiper-Installation.mp4]]
 ** Before getting started...
 
   1) The demo installation was done on a _Raspberry Pi 3 B_ running Raspbian

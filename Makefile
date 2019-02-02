@@ -4,19 +4,19 @@ CC=gcc
 
 swiper: swiper.c
 	@if [ ! -f /usr/local/include/wiringPi.h ]; then\
-		printf "wiringPi dependency not met. Please run 'make install'\n";\
+		printf "wiringPi dependency not met. Please run 'make build_depends'\n";\
 	else\
 		$(CC) -o swiper swiper.c $(LDFLAGS);\
 	fi
 
 debug: swiper.c
 	@if [ ! -f /usr/local/include/wiringPi.h ]; then\
-		printf "\nwiringPi dependency not met. Please run 'make install'\n";\
+		printf "\nwiringPi dependency not met. Please run 'make build_depends'\n";\
 	else\
 		$(CC) $(CFLAGS) swiper swiper.c $(LDFLAGS) -DEBUG;\
 	fi
 
-install: swiper.c
+build_depends: swiper.c
 	@if [ ! -f /usr/local/include/wiringPi.h ]; then\
 		printf "\n==========================\n";\
 		printf "Getting WiringPi Dependency\n";\

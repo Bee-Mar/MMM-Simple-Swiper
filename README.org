@@ -5,31 +5,46 @@
 
 * MMM-Simple-Swiper
 | Author          | Contact             |
+|-----------------+---------------------|
 | Brandon Marlowe | bpmarlowe@gmail.com |
 | Otto Juba       | ottojuba@gmail.com  |
 
 ** What is this, and why did we make this module?
-When setting up our MagicMirrors, we wanted to use two HC-SR04 ultra sonic sensors to detect motion, so we could change the currently displayed page, and feel like wizards who commanded technology using mystical powers (bad joke, I know). When searching through the modules available on the MagicMirror wiki, we found a couple of pre-existing modules built to do just that, but none of them worked. So, we searched online for answers, and found many people having the same issue with the very same modules, and decided to make our own.
+When setting up our MagicMirrors, we wanted to use two HC-SR04 ultra sonic sensors to detect motion, so we could change the currently displayed page, and feel like wizards who commanded technology using mystical powers (bad joke, I know). When searching through the modules available on the MagicMirror wiki, we found a couple of pre-existing modules built to do just that, but none of them worked. So, we searched online for answers, and found many people having the same issue with the very same modules. So, we decided to make our own.
 
 This module attempts to determine distance/motion based on the output from the sensors in a simple, efficient manner. When the =MMM-Simple-Swiper= modules loads, it sends a socket notification to =node_helper.js=. The =node_helper= then creates a child process, which calls a C executable, and supplies the JSON config as a command line argument in string format. The JSON string is parsed, the values are stored in structs, and an infinite loop is entered. Within the inifinte loop, two threads are created to collect the distance measurements, remove the outliers, and calculate the average distance. The two threads are joined, and the averages are printed to =stdout= in a =[FLOAT]:[FLOAT]= format, which is read by the child process created in =node_helper.js=. From here, the values are checked to see if both are within a certain threshold. If the values meet this criteria and there is a large enough difference between the two values, a socket nofication is sent to the =MMM-Simple-Swiper= module, which sends a notification to the =MMM-pages= module.
 
-The overwhelming majority of the work is done on the C-side (get it? It's a pun. "Bazinga" - Sheldon Cooper) of things to keep it fast and efficient. Also, we tried to keep it as lightweight as possible (267 lines of code...including the Makefile), so the code is (hopefully) pretty straightforward.
+The overwhelming majority of the work is done on the C-side (get it? It's a pun. "Bazinga" - Sheldon Cooper) of things to keep it fast and efficient. Also, we tried to keep it as lightweight as possible (280 lines of code...including the Makefile), so the code is (hopefully) pretty straightforward.
 
 ** Dependencies
-This module has three dependencies, all of which are listed below in the table. Now, you could go ahead and clone the repos, and install the libraries yourself, OOORRR you could be lazy and just let the Makefile in this module take care of that for you. When you clone this repo, and run =make=, the =wiringPi= libary is used as a dependency of the =swiper= target. Because of this, a small =if= statement checks to see if the libarary is installed. If it's not, it will clone, build, and install the library for you (aren't we nice?!). Just as a warning, the build process (as noted by the creator of =wiringPi=) does use =sudo= permissions without prompting you. Also, the two NodeJS libraries will be automagically installed by the =Makefile=...again, you are soooo welcome.
+This module has three dependencies, all of which are listed in the table below. Now, you could go ahead and clone the repos, and install the libraries yourself, OOORRR you could be lazy and just let the Makefile in this module take care of that for you. When you clone this repo, and run =make build_depends=, the =wiringPi= libary will be retrieved, built, and installed for you (aren't we nice?!). Just as a warning, the build process (as noted by the creator of =wiringPi=) does use =sudo= permissions without prompting you. Also, the two NodeJS libraries will be automagically installed by the =Makefile=...again, you are soooo welcome.
 
 (I certainly hope you're picking up on our sarcastic demeanors by this point.)
 
-   | Dependency       | Link                                         |
-   |------------------+----------------------------------------------|
-   | WiringPi         | https://git.drogon.net/                      |
-   | child_process    | https://nodejs.org/api/child_process.html    |
-   | electron-rebuild | https://github.com/electron/electron-rebuild |
+   | Library Dependencies | Link                                         |
+   |----------------------+----------------------------------------------|
+   | WiringPi             | https://git.drogon.net/                      |
+   | child_process        | https://nodejs.org/api/child_process.html    |
+   | electron-rebuild     | https://github.com/electron/electron-rebuild |
 
+
+   | Recommended MagicMirror Modules | Link                                              |
+   |---------------------------------+---------------------------------------------------|
+   | MMM-pages                       | https://github.com/edward-shen/MMM-pages          |
+   | MMM-page-indicator              | https://github.com/edward-shen/MMM-page-indicator |
 
 ** Installation
-The installation process for our module is extremely simple. First, clone this repo within the =modules= folder of the MagicMirror directory, and run =make install= to install the necessary libraries. Next, run =make= to compile the executable. That’s all! You’re ready to go. As mentioned within the =Dependencies= section, everything required for the module will be automatically downloaded, and installed. Then, simply copy and paste the example config (below) into your MagicMirror's =config.js= file, and you'll be good to go. As an aside, please do your best to briefly read all the sections in this README for important details about how far some of the values may be tweaked, and how to incorporate our module with =MMM-pages=. Additionally, within the =step-by-step-instructions= folder, there is a detailed document, and video detailing an installation from top to bottom of MagicMirror and our module.
+The installation process for our module is extremely simple. First, clone this repo within the =modules= folder of the MagicMirror directory, =cd= into the =MMM-Simple-Swiper= directory, and run =make build_depends= to install the necessary libraries. Next, run =make= to compile the executable. As mentioned within the =Dependencies= section, everything required for the module will be automatically downloaded, and installed. Then, simply copy and paste the example config (below) into your MagicMirror's =config.js= file, and you'll be good to go. As an aside, please do your best to briefly read all the sections in this README for important details about how far some of the values may be tweaked, and how to incorporate our module with =MMM-pages=. You can also copy and paste the commands listed below. Additionally, there is another section within this README entitled =Step-By-Step Instructions=, detailing a full installation of MagicMirror along with our module.
+#+BEGIN_SRC sh
+  cd ~/MagicMirror/modules/
 
+  git clone https://github.com/Bee-Mar/MMM-Simple-Swiper.git
+
+  cd MMM-Simple-Swiper
+
+  make build_depends && make
+
+#+END_SRC
 ** SuDON'T
 
 [[./images/checkurpriv.jpg]]
@@ -47,8 +62,8 @@ var child = require("child_process").spawn("sudo", [
 ...
 #+END_SRC
 
-Notice the first argument being of the =spawn= function being =sudo=, which takes care of the
-permissions required for the GPIO pins. We show you this as an attempt to be transparent.
+Notice the first argument of the =spawn= function being =sudo=, which takes care of the
+permissions required for the GPIO pins. We show you this in an attempt to be transparent, and asure you no funny business is taking place.
 
 ** Config
 The default config is shown below, and the order in which the values are listed are not important.
@@ -68,7 +83,7 @@ section below.
        threshold: 175, // in centimeters
        distanceDiff: 1.25, // difference between both sensors
        debug: false, // if true, the raw data is printed to stdout while MagicMirror is running
-       delay: 750, // time between passing data from C executable to the node_helper in milliseconds
+       delay: 1000, // time between passing data from C executable to the node_helper in milliseconds
    }
 
 // other module configs ...
@@ -97,13 +112,319 @@ modules: [
 
 
 ** Tested Conditions/Warning
-This has only been tested on the RaspberryPi 3 B using Raspbian (based on Debian Stretch), using two HC-SR04 ultra sonic sensors. This module was intended to be run along side =MMM-pages= and =MMM-page-indicator=, and has done so very well in our testing. Also, since the C executable outputs raw values from the sensors, if you wanted to take the code and utilize in another project, please, feel free. In fact, you're encouraged to do so.
+This has only been tested on the RaspberryPi 3 B using Raspbian (based on Debian Stretch), using two HC-SR04 ultra sonic sensors. This module was intended to be run along side =MMM-pages= and =MMM-page-indicator=, and has done so very well in our testing. Also, since the C executable outputs raw values from the sensors, if you wanted to take the code and utilize it in another project, please, feel free. In fact, you're encouraged to do so.
 
-Also, while messing around with the =delay= parameter of the config in the =MMM-Simple-Swiper= file, we did notice that anything less than 600 milliseconds can cause the entire module to hang after running for approximately 30 seconds. We haven't figured out exactly why, but I suspect it has to do with too much throughput, and child process not being able to read the data from stdout fast enough.
+Also, while messing around with the =delay= parameter of the config in the =MMM-Simple-Swiper= file, we did notice that anything less than 600 milliseconds can cause the entire module to hang after running for approximately 30 seconds. We haven't figured out exactly why, but we suspect it has to do with too much throughput, and the child process not being able to read the data from stdout fast enough.
 
 If you notice any bugs, please let us know, and we'll do our best to correct them. As it stands right now, this module performs how we intended, and do not plan doing anything beyond basic maintenance when absolutely necessary.
 
 Side note, I'm sure you noticed we abused the use of the special =tags=... =Well, we like how it looks=.
 
-** Demonstration
+* Performance Demonstration
 [[./video/MMM-Simple-Swiper-demo.mp4]]
+
+* Step-By-Step Instructions
+** Screencasted Video of Installation
+   
+** Before getting started...
+
+  1) The demo installation was done on a _Raspberry Pi 3 B_ running Raspbian
+     * The board was _BRAND NEW_ and the OS was _FRESHLY_ installed
+     * The installation occurred after the initial boot and initial update
+       + =Remote GPIO= and =SSH= were enabled under =raspi-config=
+       + (You can enable them as well, if you would like to by following below)
+         1) Open a terminal window
+         2) run =sudo raspi-config=
+         3) select =Interfacing Options=, select =SSH=; select =<YES>= to enable
+         4) Also within =Interfacing Options=; select =Remote GPIO=; select =<YES>= to enable 
+
+       + I created SSH keys & copied them to my laptop (for easier SSHing)
+         * For information on how to do this, see: https://www.ssh.com/ssh/keygen/
+       + Otherwise, nothing else beyond what is shown was installed or removed
+
+  2) I used my laptop to SSH into the Pi and record the installation
+     * The Pi cannot handle screen recording + installation of MagicMirror very well
+
+  3) All of these steps can be replicated directly from the Raspberry Pi 3 B in a terminal
+
+  4) There were no steps skipped throughout the video
+
+  5) An image of the pin connections for the HC-SR04 Sensors is our GitHub page
+
+  6) Instructions for the =Required Packages= are from the relevant Github pages
+
+  7) The Required Packages are the _BARE MINIMUM_ to get this working
+
+  8) _NOTE_: Within the =Basic config.js containing required modules=
+     * There are default modules, which can be removed, if desired (see comments within file)
+
+
+** Required Magic Mirror Modules
+*** NodeJS (10.15 or higher)
+   #+BEGIN_SRC sh
+
+     # taken from: https://github.com/MichMich/MagicMirror
+
+     curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+
+     sudo apt install nodejs -y
+
+   #+END_SRC
+
+*** MagicMirror
+   #+BEGIN_SRC sh
+
+     cd ~/
+
+     git clone https://github.com/MichMich/MagicMirror
+
+     cd ~/MagicMirror
+
+     npm install
+
+     # for the moment, don’t start the MagicMirror
+
+   #+END_SRC
+
+*** MMM-pages
+   #+BEGIN_SRC sh
+
+     cd ~/MagicMirror/modules/
+
+     git clone https://github.com/edward-shen/MMM-pages.git
+
+     cd ~/MagicMirror/modules/MMM-pages
+     
+     npm install
+
+   #+END_SRC
+
+*** MMM-page-indicator
+   #+BEGIN_SRC sh
+
+     cd ~/MagicMirror/modules/
+
+     git clone https://github.com/edward-shen/MMM-page-indicator.git
+
+     # this module has no package.json, so "npm install" is not needed
+
+   #+END_SRC
+
+*** MMM-Simple-Swiper
+   #+BEGIN_SRC sh
+
+     cd ~/MagicMirror/modules
+
+     git clone https://github.com/Bee-Mar/MMM-Simple-Swiper.git
+
+     cd ~/MagicMirror/modules/MMM-Simple-Swiper
+
+     # ONLY DO THIS IF YOU DON’T ALREADY HAVE A CONFIG SETUP
+     cp step-by-step-instructions/SAMPLE_CONFIG.js ~/MagicMirror/config/
+     # otherwise, simply examine the file, and see what is required
+
+     # installing dependencies and compile executable
+     make build_depends && make
+
+     # OPTIONAL: To test the module, follow below
+     cd ~/MagicMirror/modules/MMM-Simple-Swiper/
+
+     make clean && make debug
+
+     sudo ./swiper "{echoLeftPin: 24, triggerLeftPin: 23, echoRightPin: 26, triggerRightPin: 25, threshold: 175, distanceDiff: 1.25, debug: false, delay: 750, }"
+
+     # if the executable compiled correctly, then you should see values being output to the screen
+
+     # after running "make debug", recompile to build normal executable
+     make clean && make
+
+
+
+
+
+   #+END_SRC
+
+
+** Basic config.js containing required modules
+  #+BEGIN_SRC js
+    /* Magic Mirror Config Sample
+     ,*
+     ,* By Michael Teeuw http://michaelteeuw.nl
+     ,* MIT Licensed.
+     ,*
+     ,* For more information how you can configurate this file
+     ,* See https://github.com/MichMich/MagicMirror#configuration
+     ,*
+     ,*/
+
+    var config = {
+      address: "localhost", // Address to listen on, can be:
+      // - "localhost", "127.0.0.1", "::1" to listen on loopback interface
+      // - another specific IPv4/6 to listen on a specific interface
+      // - "", "0.0.0.0", "::" to listen on any interface
+      // Default, when address config is left out, is "localhost"
+      port: 8080,
+      ipWhitelist: ["127.0.0.1", "::ffff:127.0.0.1", "::1"], // Set [] to allow all IP addresses
+      // or add a specific IPv4 of 192.168.1.5 :
+      // ["127.0.0.1", "::ffff:127.0.0.1", "::1", "::ffff:192.168.1.5"],
+      // or IPv4 range of 192.168.3.0 --> 192.168.3.15 use CIDR format :
+      // ["127.0.0.1", "::ffff:127.0.0.1", "::1", "::ffff:192.168.3.0/28"],
+
+      language: "en",
+      timeFormat: 24,
+      units: "metric",
+
+      modules: [
+        {
+          module: "MMM-pages", // REQUIRED
+          config: {
+            modules: [
+              [
+                "weatherforecast", // feel free to remove or swap out
+                "newsfeed", // feel free to remove or swap out
+              ],
+              [
+                "calendar", // feel free to remove or swap out
+                "compliments", // feel free to remove or swap out
+              ],
+            ],
+            excludes: [
+              "clock", // feel free to remove or swap out
+              "currentweather", // feel free to remove or swap out
+              "MMM-page-indicator", // REQUIRED
+              "MMM-Simple-Swiper", // REQUIRED
+            ],
+          },
+        },
+        {
+          module: "MMM-page-indicator", //REQUIRED
+          position: "bottom_bar", // feel free to adjust
+          config: {
+            pages: 3, // feel free to adjust
+          },
+        },
+        {
+          module: "MMM-Simple-Swiper",
+          disabled: false,
+          config: {
+            echoLeftPin: 24, // GPIO #
+            triggerLeftPin: 23, // GPIO #
+            echoRightPin: 26, // GPIO #
+            triggerRightPin: 25, // GPIO #
+            threshold: 175, // in centimeters
+            distanceDiff: 1.25, // difference between both sensors
+            debug: false, // if true, the raw data is printed to stdout while MagicMirror is running
+            delay: 1000, // time between passing data from C executable to the node_helper in milliseconds
+          },
+        },
+        {
+          module: "alert", // feel free to remove or swap out
+          disabled: false,      
+        },
+        {
+          module: "updatenotification", // feel free to remove or swap out
+          position: "top_bar",
+          disabled: false,      
+        },
+        {
+          module: "clock", // feel free to remove or swap out
+          position: "top_right",
+          timeFormat: 12,
+          showPeriodUpper: true,
+          disabled: false,
+        },
+        {
+          module: "calendar", // feel free to remove or swap out
+          header: "US Holidays",
+          position: "top_right",
+          disabled: false,      
+          config: {
+            calendars: [
+              {
+                symbol: "calendar-check-o ",
+                url: "webcal://www.calendarlabs.com/templates/ical/US-Holidays.ics",
+              },
+            ],
+          },
+        },
+
+        {
+          module: "compliments", // feel free to remove or swap out
+          position: "lower_third",
+          disabled: true,
+        },
+
+        {
+          module: "weatherforecast", // feel free to remove or swap out
+          position: "top_right",
+          header: "Weather Forecast",
+          disabled: false,      
+          config: {
+            location: "New York, NY, USA",
+            units: "imperial",
+            appid: "c0520f8e8537b2c7555a9f7d5c2d53ec",
+          },
+        },
+
+        {
+          module: "currentweather", // feel free to remove or swap out
+          position: "top_right",
+          disabled: false,      
+          config: {
+            location: "New York, NY, USA",
+            units: "imperial",
+            appid: "c0520f8e8537b2c7555a9f7d5c2d53ec",
+          },
+        },
+
+        {
+          module: "newsfeed", // feel free to remove or swap out
+          position: "bottom_bar",
+          config: {
+            feeds: [
+              {
+                title: "New York Times",
+                url: "http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+              },
+              {
+                title: "CNET",
+                url: "https://www.cnet.com/rss/news/",
+              },
+              {
+                title: "TechRepublic",
+                url: "https://www.techrepublic.com/rssfeeds/articles/",
+              },
+            ],
+            showSourceTitle: true,
+            showPublishDate: true,
+          },
+        },
+      ],
+    };
+
+    /*************** DO NOT EDIT THE LINE BELOW ***************/
+    if (typeof module !== "undefined") {
+      module.exports = config;
+    }
+  #+END_SRC
+
+
+** Start MagicMirror
+   #+BEGIN_SRC sh
+
+     cd ~/MagicMirror
+
+     npm start
+
+     # check to ensure the MMM-Simple-Swiper module is running
+     ps -ef | egrep -i "sudo\s+.*./MMM-Simple-Swiper/swiper"
+
+     # if it is running, you should see an output similar to this
+     sudo /home/pi/MagicMirror/modules/MMM-Simple-Swiper/main {"echoLeftPin":24,"triggerLeftPin":23,"echoRightPin":26,"triggerRightPin":25,"threshold":175,"distanceDiff":1.25,"debug":false,"delay":1000}
+
+     # depending on the arguments provided to the config, your JSON string may differ
+
+   #+END_SRC
+
+
+

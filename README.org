@@ -10,16 +10,52 @@
 | Otto Juba       | ottojuba@gmail.com  |
 
 ** What is this, and why did we make this module?
-When setting up our MagicMirrors, we wanted to use two HC-SR04 ultra sonic sensors to detect motion, so we could change the currently displayed page, and feel like wizards who commanded technology using mystical powers (bad joke, I know). When searching through the modules available on the MagicMirror wiki, we found a couple of pre-existing modules built to do just that, but none of them worked. So, we searched online for answers, and found many people having the same issue with the very same modules. So, we decided to make our own.
+   When setting up our MagicMirrors, we wanted to use two HC-SR04 ultra
+   sonic sensors to detect motion, so we could change the currently
+   displayed page, and feel like wizards who commanded technology using
+   mystical powers (bad joke, I know). When searching through the modules
+   available on the MagicMirror wiki, we found a couple of pre-existing
+   modules built to do just that, but none of them worked. So, we
+   searched online for answers, and found many people having the same
+   issue with the very same modules. So, we decided to make our own.
 
-This module attempts to determine distance/motion based on the output from the sensors in a simple, efficient manner. When the =MMM-Simple-Swiper= modules loads, it sends a socket notification to =node_helper.js=. The =node_helper= then creates a child process, which calls a C executable, and supplies the JSON config as a command line argument in string format. The JSON string is parsed, the values are stored in structs, and an infinite loop is entered. Within the inifinte loop, two threads are created to collect the distance measurements, remove the outliers, and calculate the average distance. The two threads are joined, and the averages are printed to =stdout= in a =[FLOAT]:[FLOAT]= format, which is read by the child process created in =node_helper.js=. From here, the values are checked to see if both are within a certain threshold. If the values meet this criteria and there is a large enough difference between the two values, a socket nofication is sent to the =MMM-Simple-Swiper= module, which sends a notification to the =MMM-pages= module.
+   This module attempts to determine distance/motion based on the output
+   from the sensors in a simple, efficient manner. When the
+   =MMM-Simple-Swiper= modules loads, it sends a socket notification to
+   =node_helper.js=. The =node_helper= then creates a child process,
+   which calls a C executable, and supplies the JSON config as a command
+   line argument in string format. The JSON string is parsed, the values
+   are stored in structs, and an infinite loop is entered. Within the
+   inifinte loop, two threads are created to collect the distance
+   measurements, remove the outliers, and calculate the average
+   distance. The two threads are joined, and the averages are printed to
+   =stdout= in a =[FLOAT]:[FLOAT]= format, which is read by the child
+   process created in =node_helper.js=. From here, the values are checked
+   to see if both are within a certain threshold. If the values meet this
+   criteria and there is a large enough difference between the two
+   values, a socket nofication is sent to the =MMM-Simple-Swiper= module,
+   which sends a notification to the =MMM-pages= module.
 
-The overwhelming majority of the work is done on the C-side (get it? It's a pun. "Bazinga" - Sheldon Cooper) of things to keep it fast and efficient. Also, we tried to keep it as lightweight as possible (280 lines of code...including the Makefile), so the code is (hopefully) pretty straightforward.
+   The overwhelming majority of the work is done on the C-side (get it?
+   It's a pun. "Bazinga" - Sheldon Cooper) of things to keep it fast and
+   efficient. Also, we tried to keep it as lightweight as possible (280
+   lines of code...including the Makefile), so the code is (hopefully)
+   pretty straightforward.
 
 ** Dependencies
-This module has three dependencies, all of which are listed in the table below. Now, you could go ahead and clone the repos, and install the libraries yourself, OOORRR you could be lazy and just let the Makefile in this module take care of that for you. When you clone this repo, and run =make build_depends=, the =wiringPi= libary will be retrieved, built, and installed for you (aren't we nice?!). Just as a warning, the build process (as noted by the creator of =wiringPi=) does use =sudo= permissions without prompting you. Also, the two NodeJS libraries will be automagically installed by the =Makefile=...again, you are soooo welcome.
+   This module has three dependencies, all of which are listed in the
+   table below. Now, you could go ahead and clone the repos, and install
+   the libraries yourself, OOORRR you could be lazy and just let the
+   Makefile in this module take care of that for you. When you clone this
+   repo, and run =make build_depends=, the =wiringPi= libary will be
+   retrieved, built, and installed for you (aren't we nice?!). Just as a
+   warning, the build process (as noted by the creator of =wiringPi=)
+   does use =sudo= permissions without prompting you. Also, the two
+   NodeJS libraries will be automagically installed by the
+   =Makefile=...again, you are soooo welcome.
 
-(I certainly hope you're picking up on our sarcastic demeanors by this point.)
+   (I certainly hope you're picking up on our sarcastic demeanors by this
+   point.)
 
    | Library Dependencies | Link                                         |
    |----------------------+----------------------------------------------|
@@ -34,7 +70,22 @@ This module has three dependencies, all of which are listed in the table below. 
    | MMM-page-indicator              | https://github.com/edward-shen/MMM-page-indicator |
 
 ** Installation
-The installation process for our module is extremely simple. First, clone this repo within the =modules= folder of the MagicMirror directory, =cd= into the =MMM-Simple-Swiper= directory, and run =make build_depends= to install the necessary libraries. Next, run =make= to compile the executable. As mentioned within the =Dependencies= section, everything required for the module will be automatically downloaded, and installed. Then, simply copy and paste the example config (below) into your MagicMirror's =config.js= file, and you'll be good to go. As an aside, please do your best to briefly read all the sections in this README for important details about how far some of the values may be tweaked, and how to incorporate our module with =MMM-pages=. You can also copy and paste the commands listed below. Additionally, there is another section within this README entitled =Step-By-Step Instructions=, detailing a full installation of MagicMirror along with our module.
+   The installation process for our module is extremely simple. First,
+   clone this repo within the =modules= folder of the MagicMirror
+   directory, =cd= into the =MMM-Simple-Swiper= directory, and run =make
+   build_depends= to install the necessary libraries. Next, run =make= to
+   compile the executable. As mentioned within the =Dependencies=
+   section, everything required for the module will be automatically
+   downloaded, and installed. Then, simply copy and paste the example
+   config (below) into your MagicMirror's =config.js= file, and you'll be
+   good to go. As an aside, please do your best to briefly read all the
+   sections in this README for important details about how far some of
+   the values may be tweaked, and how to incorporate our module with
+   =MMM-pages=. You can also copy and paste the commands listed
+   below. Additionally, there is another section within this README
+   entitled =Step-By-Step Instructions=, detailing a full installation of
+   MagicMirror along with our module.
+
 #+BEGIN_SRC sh
   cd ~/MagicMirror/modules/
 
@@ -47,40 +98,47 @@ The installation process for our module is extremely simple. First, clone this r
 #+END_SRC
 ** SuDON'T
 
-[[./images/checkurpriv.jpg]]
+   [[./images/checkurpriv.jpg]]
 
-When running this module, there is absolutely no need to execute =sudo= with =npm start=. This is due to the small hack (I guess it can be considered a hack??) used when launching the child process within =node_helper.js=. The code snippet where this occurs is shown below:
+   When running this module, there is absolutely no need to execute
+   =sudo= with =npm start=. This is due to the small hack (I guess it can
+   be considered a hack??) used when launching the child process within
+   =node_helper.js=. The code snippet where this occurs is shown below:
+
 
 #+BEGIN_SRC js
-...
+  // other code above ...
 
-var child = require("child_process").spawn("sudo", [
-   __dirname + "/swiper",
-   JSON.stringify(payload),
-]);
+  var child = require("child_process").spawn("sudo", [
+     __dirname + "/swiper",
+     JSON.stringify(payload),
+  ]);
 
-...
+  // other code below ...
 #+END_SRC
 
-Notice the first argument of the =spawn= function being =sudo=, which takes care of the
-permissions required for the GPIO pins. We show you this in an attempt to be transparent, and asure you no funny business is taking place.
+Notice the first argument of the =spawn= function being =sudo=, which
+takes care of the permissions required for the GPIO pins. We show you
+this in an attempt to be transparent, and asure you no funny business
+is taking place.
 
 ** Raspberry Pi Pin Layout Reference
    [[./images/raspberry_pi_circuit_note_fig2a.jpg]]
    * Source: https://www.jameco.com/Jameco/workshop/circuitnotes/raspberry_pi_circuit_note_fig2a.jpg
-     
+
 ** Wiring the Sensors
    [[./images/hcsr04.png]]
    * Source: https://github.com/mochman/MMM-Swipe (shamelessly lifted)
-   
+
 ** How we wired ours
    [[./images/MMM-Simple-Swiper-Pin-Layout.jpg]]
    * _IMPORTANT:_ Do not forget to add a resistor to the Echo wire. Refer to the diagram above.
 
 ** Config
-The default config is shown below, and the order in which the values are listed are not important.
-Feel free to tweak the values to your needs. Also, please read the =Tested Conditions/Warning=
-section below.
+   The default config is shown below, and the order in which the values
+   are listed are not important.  Feel free to tweak the values to your
+   needs. Also, please read the =Tested Conditions/Warning= section
+   below.
 
 #+BEGIN_SRC js
 // other module configs ...
@@ -102,42 +160,73 @@ section below.
 #+END_SRC
 
 ** MMM-pages
-When using with =MMM-pages=, place =MMM-Simple-Swiper= within the =excludes= section. For the life of us, we still don't understand why the =excludes= section is the list of modules which are fixed in place. All we're saying is that if something is constant, or fixed, it should be called, I don't know, =constant=, or =fixed= rather than =excludes=...but we didn't make the =MMM-pages= module, so who are we to decide.
+   When using with =MMM-pages=, place =MMM-Simple-Swiper= within the
+   =fixed= property. The =fixed= property contains the list of modules
+   which are fixed in place (as the name would suggest).
 
-Just so it's more clear, here's the example config taken from the =MMM-pages= Github, with our module tucked nicely inside the fix...we mean =excludes= section.
+   Just so it's more clear, here's the example config taken from the
+   =MMM-pages= Github, with our module tucked nicely inside the
+   =fixed= section.
 
 #+BEGIN_SRC js
-modules: [
-   {
+  modules: [
+    {
       module: 'MMM-pages',
       config: {
-         modules: [
-               [ "weatherforecast", "newsfeed"],
-               [ "calendar", "compliments" ]
-            ],
+        modules: [
+          [ "weatherforecast", "newsfeed"],
+          [ "calendar", "compliments" ]
+        ],
 
-            excludes: ["clock", "currentweather", "MMM-page-indicator", "MMM-Simple-Swiper"],
-        }
+        fixed: [
+          "clock",
+          "currentweather",
+          "MMM-page-indicator",
+          "MMM-Simple-Swiper"
+        ],
+
+      }
     }
-]
+  ]
 #+END_SRC
 
 
 ** Tested Conditions/Warning
-This has only been tested on the RaspberryPi 3 B using Raspbian (based on Debian Stretch), using two HC-SR04 ultra sonic sensors. This module was intended to be run along side =MMM-pages= and =MMM-page-indicator=, and has done so very well in our testing. Also, since the C executable outputs raw values from the sensors, if you wanted to take the code and utilize it in another project, please, feel free. In fact, you're encouraged to do so.
+   This has only been tested on the RaspberryPi 3 B using Raspbian (based
+   on Debian Stretch), using two HC-SR04 ultra sonic sensors. This module
+   was intended to be run along side =MMM-pages= and
+   =MMM-page-indicator=, and has done so very well in our testing. Also,
+   since the C executable outputs raw values from the sensors, if you
+   wanted to take the code and utilize it in another project, please,
+   feel free. In fact, you're encouraged to do so.
 
-While messing around with the =delay= parameter of the config in the =MMM-Simple-Swiper= file, we did notice that anything less than 600 milliseconds can cause the entire module to hang after running for approximately 30 seconds. We haven't figured out exactly why, but we suspect it has to do with too much throughput, and the child process not being able to read the data from stdout fast enough. Additionally, attempting to cover the sensors or swiping across the sensors rapidly can cause the module to lock up as well. We are actively looking into this issue, but, if you can exercise patience, and swipe through your pages at a moderate pace, you will not experience this issue. 
+   While messing around with the =delay= parameter of the config in the
+   =MMM-Simple-Swiper= file, we did notice that anything less than 600
+   milliseconds can cause the entire module to hang after running for
+   approximately 30 seconds. We haven't figured out exactly why, but we
+   suspect it has to do with too much throughput, and the child process
+   not being able to read the data from stdout fast enough. Additionally,
+   attempting to cover the sensors or swiping across the sensors rapidly
+   can cause the module to lock up. We are actively looking into
+   this issue, but, if you can exercise patience, and swipe through your
+   pages at a moderate pace, you will not experience this issue.
 
-If you notice any bugs, please let us know, and we'll do our best to correct them. As it stands right now, this module performs how we intended, and do not plan doing anything beyond basic maintenance when absolutely necessary.
+   If you notice any bugs, please let us know, and we'll do our best to
+   correct them.
 
-Side note, I'm sure you noticed we abused the use of the special =tags=... =Well, we like how it looks=.
+   Side note, I'm sure you noticed we abused the use of the special
+   =tags=... =Well, we like how it looks=.
 
 * Future Work
-We intend to add more options that can be tweaked from the =config.js=, such as:\\
- * being able to change the direction in which pages slide (ie. left-to-right or right-to-left)
- * adjusting the number of samples the sensors use for determining motion
+  We intend to add more options that can be tweaked from the
+  =config.js=, such as:\\
+  * being able to change the direction in which pages slide
+    (ie. left-to-right or right-to-left)
+  * adjusting the number of samples the sensors use for determining
+    motion
 
-If you have any suggestions that would be cool, or useful, feel free to email us!
+  If you have any suggestions that would be cool, or useful, feel free
+  to email us!
 
 * Performance Demonstration
 [[./videos/MMM-Simple-Swiper-Demo.mp4]]
@@ -147,33 +236,45 @@ If you have any suggestions that would be cool, or useful, feel free to email us
    [[./videos/MMM-Simple-Swiper-Installation.mp4]]
 ** Before getting started...
 
-  1) The demo installation was done on a _Raspberry Pi 3 B_ running Raspbian
-     * The board was _BRAND NEW_ and the OS was _FRESHLY_ installed
-     * The installation occurred after the initial boot and initial update
-       + =Remote GPIO= and =SSH= were enabled under =raspi-config=
-       + (You can enable them as well, if you would like to by following below)
-         1) Open a terminal window
-         2) run =sudo raspi-config=
-         3) select =Interfacing Options=, select =SSH=; select =<YES>= to enable
-         4) Also within =Interfacing Options=; select =Remote GPIO=; select =<YES>= to enable 
+   1) The demo installation was done on a _Raspberry Pi 3 B_ running
+      Raspbian
+      * The board was _BRAND NEW_ and the OS was _FRESHLY_ installed
+      * The installation occurred after the initial boot and initial
+        update
+        + =Remote GPIO= and =SSH= were enabled under =raspi-config=
+        + (You can enable them as well, if you would like to by
+          following below)
+          1) Open a terminal window
+          2) run =sudo raspi-config=
+          3) select =Interfacing Options=, select =SSH=; select =<YES>=
+             to enable
+          4) Also within =Interfacing Options=; select =Remote GPIO=;
+             select =<YES>= to enable
 
-       + I created SSH keys & copied them to my laptop (for easier SSHing)
-         * For information on how to do this, see: https://www.ssh.com/ssh/keygen/
-       + Otherwise, nothing else beyond what is shown was installed or removed
+        + I created SSH keys & copied them to my laptop (for easier
+          SSHing)
+          * For information on how to do this, see:
+            https://www.ssh.com/ssh/keygen/
+        + Otherwise, nothing else beyond what is shown was installed or
+          removed
 
-  2) I used my laptop to SSH into the Pi and record the installation
-     * The Pi cannot handle screen recording + installation of MagicMirror very well
+   2) I used my laptop to SSH into the Pi and record the installation
+      * The Pi cannot handle screen recording + installation of
+        MagicMirror very well
 
-  3) All of these steps can be replicated directly from the Raspberry Pi 3 B in a terminal
+   3) All of these steps can be replicated directly from the Raspberry
+      Pi 3 B in a terminal
 
-  4) There were no steps skipped throughout the video
+   4) There were no steps skipped throughout the video
 
-  5) Instructions for the =Required Packages= are from the relevant Github pages
+   5) Instructions for the =Required Packages= are from the relevant
+      Github pages
 
-  6) The Required Packages are the _BARE MINIMUM_ to get this working
+   6) The Required Packages are the _BARE MINIMUM_ to get this working
 
-  7) _NOTE_: Within the =Basic config.js containing required modules=
-     * There are default modules, which can be removed, if desired (see comments within file)
+   7) _NOTE_: Within the =Basic config.js containing required modules=
+      * There are default modules, which can be removed, if desired
+        (see comments within file)
 
 
 ** Required Magic Mirror Modules
@@ -211,7 +312,7 @@ If you have any suggestions that would be cool, or useful, feel free to email us
      git clone https://github.com/edward-shen/MMM-pages.git
 
      cd ~/MagicMirror/modules/MMM-pages
-     
+
      npm install
 
    #+END_SRC
@@ -305,7 +406,7 @@ If you have any suggestions that would be cool, or useful, feel free to email us
                 "compliments", // feel free to remove or swap out
               ],
             ],
-            excludes: [
+            fixed: [
               "clock", // feel free to remove or swap out
               "currentweather", // feel free to remove or swap out
               "MMM-page-indicator", // REQUIRED
@@ -336,12 +437,12 @@ If you have any suggestions that would be cool, or useful, feel free to email us
         },
         {
           module: "alert", // feel free to remove or swap out
-          disabled: false,      
+          disabled: false,
         },
         {
           module: "updatenotification", // feel free to remove or swap out
           position: "top_bar",
-          disabled: false,      
+          disabled: false,
         },
         {
           module: "clock", // feel free to remove or swap out
@@ -354,7 +455,7 @@ If you have any suggestions that would be cool, or useful, feel free to email us
           module: "calendar", // feel free to remove or swap out
           header: "US Holidays",
           position: "top_right",
-          disabled: false,      
+          disabled: false,
           config: {
             calendars: [
               {
@@ -375,7 +476,7 @@ If you have any suggestions that would be cool, or useful, feel free to email us
           module: "weatherforecast", // feel free to remove or swap out
           position: "top_right",
           header: "Weather Forecast",
-          disabled: false,      
+          disabled: false,
           config: {
             location: "New York, NY, USA",
             units: "imperial",
@@ -386,7 +487,7 @@ If you have any suggestions that would be cool, or useful, feel free to email us
         {
           module: "currentweather", // feel free to remove or swap out
           position: "top_right",
-          disabled: false,      
+          disabled: false,
           config: {
             location: "New York, NY, USA",
             units: "imperial",
@@ -442,6 +543,3 @@ If you have any suggestions that would be cool, or useful, feel free to email us
      # depending on the arguments provided to the config, your JSON string may differ
 
    #+END_SRC
-
-
-

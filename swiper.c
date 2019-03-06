@@ -1,3 +1,5 @@
+#define _BSD_SOURCE // that damn usleep macro requirement
+
 #include <ctype.h>
 #include <math.h>
 #include <pthread.h>
@@ -14,12 +16,13 @@
 #include <unistd.h>
 #include <wiringPi.h>
 
+#define READ 0
+#define WRITE 1
 #define LEFT 0
 #define RIGHT 1
 #define NUM_SAMPLES 10
-
-#define NUM_SECONDS 2.0
 #define DEBUG 3
+#define CLEAR -10000.0
 
 #if defined(DEBUG) && DEBUG > 0
 #define DEBUG_PRINT(fmt, args...)                                              \
@@ -29,18 +32,25 @@
 #define DEBUG_PRINT(fmt, args...)
 #endif
 
+float sensor_output[2] = {CLEAR, CLEAR};
+
+pthread_mutex_t mut;
+pthread_cond_t stdout_cond;
+int stdo_hand_rd = 0;
+
 struct sensor_bundle {
-  float avg_dist;
   int trigger;
   int echo;
   int signal;
+  float delay;
+  int side;
 };
 
 void signal_catcher(int sig) {
   // catch the signal and clean up
   printf("SIGINT caught. Shutting down swiper MMM-simple-swiper.\n");
   wait(0); // wait for cleanup
-  exit(0); // the exit
+  exit(0);
 }
 
 void error_msg(char *msg) {
@@ -52,51 +62,80 @@ int compare(const void *a, const void *b) { return (*(int *)a) - (*(int *)b); }
 
 float avg(float vals[NUM_SAMPLES]) {
   int i = 0;
-  float sum = 0.0, avg = 0.0;
+  float sum = 0.0;
 
   // only uses the first half of the values to extreme outliers
-  for (i = 0; i < NUM_SAMPLES / 2; i++)
+  for (i = 0; i < NUM_SAMPLES / 2; i++) {
     sum += vals[i];
+  }
 
   return sum / (NUM_SAMPLES / 2);
 }
 
-void *sensor_distance(struct sensor_bundle *sensor) {
+void stdout_handler() {
 
-  int i = 0;
-  float distance[NUM_SAMPLES];
-  long int start = (long int)time(NULL), end = (long int)time(NULL);
-  long int elapsed = 0;
+  stdo_hand_rd = 1;
 
-  for (i = 0; i < NUM_SAMPLES; i++) {
+  while (1) {
+    if (sensor_output[LEFT] != CLEAR && sensor_output[RIGHT] != CLEAR) {
 
-    digitalWrite(sensor->trigger, HIGH);
-    delayMicroseconds(100);
-    digitalWrite(sensor->trigger, LOW);
+      printf("%f:%f", sensor_output[0], sensor_output[1]);
 
-    while (digitalRead(sensor->echo) == LOW)
-      start = micros();
-
-    while (digitalRead(sensor->echo) == HIGH)
-      end = micros();
-
-    elapsed = end - start;
-    elapsed = end - start;
-
-    distance[i] = elapsed / 58;
+      sensor_output[0] = sensor_output[1] = CLEAR;
+      pthread_mutex_unlock(&mut);
+    }
   }
-
-  // sort the values, then get their average
-  qsort(distance, NUM_SAMPLES, sizeof(float), compare);
-  sensor->avg_dist = avg(distance);
 }
 
-void parse_JSON(struct sensor_bundle sensor[2], char *JSON, int *delay) {
+void sensor_distance(struct sensor_bundle *sensor) {
+
+  int i = 0;                 // loop counter
+  int delay = sensor->delay; // to prevent re-reading the same struct
+
+  float distance[NUM_SAMPLES];
+  long int start = 0, end = 0, elapsed = 0;
+
+  int sensor_side = sensor->side;
+
+  while (1) {
+
+    start = (long int)time(NULL);
+    end = (long int)time(NULL);
+    elapsed = 0;
+
+    for (i = 0; i < NUM_SAMPLES; i++) {
+
+      digitalWrite(sensor->trigger, HIGH);
+      delayMicroseconds(100);
+      digitalWrite(sensor->trigger, LOW);
+
+      while (digitalRead(sensor->echo) == LOW) {
+        start = micros();
+      }
+
+      while (digitalRead(sensor->echo) == HIGH) {
+        end = micros();
+      }
+
+      elapsed = end - start;
+      elapsed = end - start;
+
+      distance[i] = elapsed / 58;
+    }
+
+    // sort the values, write average to global array, then nap
+    qsort(distance, NUM_SAMPLES, sizeof(float), compare);
+    sensor_output[sensor_side] = avg(distance);
+    usleep(delay * 1000); // in milliseconds
+    pthread_mutex_lock(&mut);
+  }
+}
+
+void parse_JSON(struct sensor_bundle sensor[2], char *JSON) {
   int len = strlen(JSON) + 1;
-  char config_type[20], config_value[15];
-  int j = 0, k = 0, i = 0; // counters
-  int type, side;          // to determine the sensor and pin type
-  char curr_char;
+  char config_type[20], config_value[15], curr_char;
+  int j = 0, k = 0, i = 0; // counters and shit
+  int side;
 
   for (i = 0; i < len; i++) {
     curr_char = tolower(JSON[i]);
@@ -115,10 +154,10 @@ void parse_JSON(struct sensor_bundle sensor[2], char *JSON, int *delay) {
         sensor[side].echo = atoi(config_value);
       } else if (strstr(config_type, "delay")) {
         DEBUG_PRINT("DELAY: %d\n", atoi(config_value));
-        *delay = atoi(config_value);
+        sensor[side].delay = atoi(config_value);
       }
 
-      // clear the entire array so no extra chars mess it up
+      // clear the entire array so no extra chars f--k it up
       memset(config_type, 0, sizeof(config_type));
       memset(config_value, 0, sizeof(config_value));
       k = j = 0;
@@ -128,22 +167,23 @@ void parse_JSON(struct sensor_bundle sensor[2], char *JSON, int *delay) {
 
 int main(int argc, char *argv[]) {
 
-  if (argc < 2)
+  if (argc < 2) {
     error_msg("ERROR: No input arguments.");
+  }
 
-  // installing signal catching for Ctr-C events
+  // snatch those gnarly keyboard interrupts
   signal(SIGINT, signal_catcher);
 
   struct sensor_bundle sensor[2];
-  int delay = 1000; // if nothing gets defined
 
   // read and parse the config passed over from MMM-simple-swiper.js
+  parse_JSON(sensor, argv[1]);
 
-  parse_JSON(sensor, argv[1], &delay);
+  // yeah, this seems dumb, but it’s used within the "sensor_distance" function
+  sensor[LEFT].side = LEFT;
+  sensor[RIGHT].side = RIGHT;
 
-  int i = 0;
-  pthread_t thread[2];
-
+  // setting up the pins and stuff
   wiringPiSetupGpio();
 
   pinMode(sensor[LEFT].trigger, OUTPUT);
@@ -155,22 +195,25 @@ int main(int argc, char *argv[]) {
   digitalWrite(sensor[LEFT].trigger, LOW);
   digitalWrite(sensor[RIGHT].trigger, LOW);
 
-  while (1) {
+  pthread_t thread[3]; // array of threads
+  pthread_mutex_init(&mut, NULL);
 
-    // running two threads to calculate the distance of each sensor
-    for (i = 0; i < 2; i++)
-      pthread_create(&thread[i], NULL, (void *)sensor_distance, &sensor[i]);
+  // this thread reads the global array and prints to stdout
+  pthread_create(&thread[2], NULL, (void *)stdout_handler, NULL);
 
-    for (i = 0; i < 2; i++)
-      pthread_join(thread[i], NULL);
+  // the ensure the handler thread gets started first
+  while (!stdo_hand_rd)
+    ;
 
-    // flush stdout, and let the node_helper resolve motion
-    printf("%f:%f\n", sensor[LEFT].avg_dist, sensor[RIGHT].avg_dist);
-    fflush(stdout);
+  // running two threads indefinitely to calculate the distance of each sensor
+  pthread_create(&thread[0], NULL, (void *)sensor_distance, &sensor[0]);
+  pthread_create(&thread[1], NULL, (void *)sensor_distance, &sensor[1]);
 
-    // converted to milliseconds
-    usleep(delay * 1000);
-  }
+  pthread_join(thread[0], NULL);
+  pthread_join(thread[1], NULL);
+  pthread_join(thread[2], NULL);
+
+  pthread_mutex_destroy(&mut);
 
   return 0;
 }

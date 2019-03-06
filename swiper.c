@@ -34,10 +34,9 @@
 
 float sensor_output[2] = {CLEAR, CLEAR};
 
-pthread_mutex_t mut;
-pthread_cond_t cond;
+pthread_barrier_t barrier;
 
-int stdo_hand_rd = 0;
+int STDOUT_THREAD_READY = 0;
 
 struct sensor_bundle {
   int trigger;
@@ -74,7 +73,7 @@ float avg(float vals[NUM_SAMPLES]) {
 
 void stdout_handler() {
 
-  stdo_hand_rd = 1;
+  STDOUT_THREAD_READY = 1;
 
   while (1) {
     if (sensor_output[LEFT] != CLEAR && sensor_output[RIGHT] != CLEAR) {
@@ -82,9 +81,7 @@ void stdout_handler() {
       printf("%f:%f", sensor_output[0], sensor_output[1]);
       fflush(stdout);
 
-      sensor_output[0] = sensor_output[1] = CLEAR;
-      pthread_mutex_unlock(&mut);
-      pthread_cond_signal(&cond);
+      sensor_output[LEFT] = sensor_output[RIGHT] = CLEAR;
     }
   }
 }
@@ -129,7 +126,8 @@ void sensor_distance(struct sensor_bundle *sensor) {
     qsort(distance, NUM_SAMPLES, sizeof(float), compare);
     sensor_output[sensor_side] = avg(distance);
 
-    pthread_cond_wait(&cond, &mut);
+    pthread_barrier_wait(&barrier); // sync those threads yo
+
     usleep(delay * 1000); // in milliseconds
   }
 }
@@ -199,14 +197,14 @@ int main(int argc, char *argv[]) {
   digitalWrite(sensor[RIGHT].trigger, LOW);
 
   pthread_t thread[3]; // array of threads
-  pthread_mutex_init(&mut, NULL);
+  pthread_barrier_init(&barrier, NULL, 2);
 
   // this thread reads the global array and prints to stdout
   pthread_create(&thread[2], NULL, (void *)stdout_handler, NULL);
 
-  // to ensure the handler thread gets started first
+  // to guarantee the stdout handler thread gets started first
   do { /* pass */
-  } while (!stdo_hand_rd);
+  } while (!STDOUT_THREAD_READY);
 
   // running two threads indefinitely to calculate the distance of each sensor
   pthread_create(&thread[0], NULL, (void *)sensor_distance, &sensor[0]);
@@ -214,11 +212,11 @@ int main(int argc, char *argv[]) {
 
   int i;
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++) {
     pthread_join(thread[i], NULL);
+  }
 
-  pthread_mutex_destroy(&mut);
-  pthread_cond_destroy(&cond);
+  pthread_barrier_destroy(&barrier);
 
   return 0;
 }

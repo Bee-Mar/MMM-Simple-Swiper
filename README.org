@@ -4,10 +4,10 @@
 #+OPTIONS: toc:nil
 
 * MMM-Simple-Swiper
-| Author          | Contact             |
-|-----------------+---------------------|
-| Brandon Marlowe | bpmarlowe@gmail.com |
-| Otto Juba       | ottojuba@gmail.com  |
+  | Author          | Contact             |
+  |-----------------+---------------------|
+  | Brandon Marlowe | bpmarlowe@gmail.com |
+  | Otto Juba       | ottojuba@gmail.com  |
 
 ** What is this, and why did we make this module?
    When setting up our MagicMirrors, we wanted to use two HC-SR04 ultra

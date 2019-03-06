@@ -218,6 +218,7 @@ int main(int argc, char *argv[]) {
     pthread_join(thread[i], NULL);
 
   pthread_mutex_destroy(&mut);
+  pthread_cond_destroy(&cond);
 
   return 0;
 }

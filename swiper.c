@@ -80,6 +80,7 @@ void stdout_handler() {
     if (sensor_output[LEFT] != CLEAR && sensor_output[RIGHT] != CLEAR) {
 
       printf("%f:%f", sensor_output[0], sensor_output[1]);
+      fflush(stdout);
 
       sensor_output[0] = sensor_output[1] = CLEAR;
       pthread_mutex_unlock(&mut);

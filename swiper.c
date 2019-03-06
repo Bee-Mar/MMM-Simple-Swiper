@@ -1,4 +1,4 @@
-#define _BSD_SOURCE // that damn usleep macro requirement
+#define _DEFAULT_SOURCE // that damn usleep macro requirement
 
 #include <ctype.h>
 #include <math.h>

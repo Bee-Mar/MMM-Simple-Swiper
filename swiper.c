@@ -36,6 +36,7 @@ float sensor_output[2] = {CLEAR, CLEAR};
 
 pthread_mutex_t mut;
 pthread_cond_t stdout_cond;
+
 int stdo_hand_rd = 0;
 
 struct sensor_bundle {
@@ -127,8 +128,10 @@ void sensor_distance(struct sensor_bundle *sensor) {
     // sort the values, write average to global array, then nap
     qsort(distance, NUM_SAMPLES, sizeof(float), compare);
     sensor_output[sensor_side] = avg(distance);
-    usleep(delay * 1000); // in milliseconds
+
+    // pthread_cond might be better here
     pthread_mutex_lock(&mut);
+    usleep(delay * 1000); // in milliseconds
   }
 }
 
@@ -202,9 +205,9 @@ int main(int argc, char *argv[]) {
   // this thread reads the global array and prints to stdout
   pthread_create(&thread[2], NULL, (void *)stdout_handler, NULL);
 
-  // the ensure the handler thread gets started first
-  while (!stdo_hand_rd)
-    ;
+  // to ensure the handler thread gets started first
+  do { /* pass */
+  } while (!stdo_hand_rd);
 
   // running two threads indefinitely to calculate the distance of each sensor
   pthread_create(&thread[0], NULL, (void *)sensor_distance, &sensor[0]);

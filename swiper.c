@@ -91,13 +91,13 @@ void stdout_handler() {
 
 void sensor_distance(struct sensor_bundle *sensor) {
 
-  int i = 0;                 // loop counter
+  int i = 0; // loop counter
+
   int delay = sensor->delay; // to prevent re-reading the same struct
+  int sensor_side = sensor->side;
 
   float distance[NUM_SAMPLES];
   long int start = 0, end = 0, elapsed = 0;
-
-  int sensor_side = sensor->side;
 
   while (1) {
 

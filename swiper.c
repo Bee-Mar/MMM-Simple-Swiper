@@ -35,7 +35,7 @@
 float sensor_output[2] = {CLEAR, CLEAR};
 
 pthread_mutex_t mut;
-pthread_cond_t stdout_cond;
+pthread_cond_t cond;
 
 int stdo_hand_rd = 0;
 
@@ -66,9 +66,8 @@ float avg(float vals[NUM_SAMPLES]) {
   float sum = 0.0;
 
   // only uses the first half of the values to extreme outliers
-  for (i = 0; i < NUM_SAMPLES / 2; i++) {
+  for (i = 0; i < NUM_SAMPLES / 2; i++)
     sum += vals[i];
-  }
 
   return sum / (NUM_SAMPLES / 2);
 }
@@ -85,6 +84,7 @@ void stdout_handler() {
 
       sensor_output[0] = sensor_output[1] = CLEAR;
       pthread_mutex_unlock(&mut);
+      pthread_cond_signal(&cond);
     }
   }
 }
@@ -129,8 +129,7 @@ void sensor_distance(struct sensor_bundle *sensor) {
     qsort(distance, NUM_SAMPLES, sizeof(float), compare);
     sensor_output[sensor_side] = avg(distance);
 
-    // pthread_cond might be better here
-    pthread_mutex_lock(&mut);
+    pthread_cond_wait(&cond, &mut);
     usleep(delay * 1000); // in milliseconds
   }
 }
@@ -213,9 +212,10 @@ int main(int argc, char *argv[]) {
   pthread_create(&thread[0], NULL, (void *)sensor_distance, &sensor[0]);
   pthread_create(&thread[1], NULL, (void *)sensor_distance, &sensor[1]);
 
-  pthread_join(thread[0], NULL);
-  pthread_join(thread[1], NULL);
-  pthread_join(thread[2], NULL);
+  int i;
+
+  for (i = 0; i < 3; i++)
+    pthread_join(thread[i], NULL);
 
   pthread_mutex_destroy(&mut);
 

@@ -35,6 +35,8 @@
 float sensor_output[2] = {CLEAR, CLEAR};
 
 pthread_barrier_t barrier;
+pthread_cond_t cond;
+pthread_mutex_t mutex;
 
 int STDOUT_THREAD_READY = 0;
 
@@ -82,6 +84,9 @@ void stdout_handler() {
       fflush(stdout);
 
       sensor_output[LEFT] = sensor_output[RIGHT] = CLEAR;
+
+      pthread_cond_broadcast(&cond);
+      pthread_mutex_unlock(&mutex);
     }
   }
 }
@@ -125,11 +130,11 @@ void sensor_distance(struct sensor_bundle *sensor) {
     // sort the values, write average to global array, then nap
     qsort(distance, NUM_SAMPLES, sizeof(float), compare);
     sensor_output[sensor_side] = avg(distance);
-
-    pthread_barrier_wait(&barrier); // sync those threads yo
-
     usleep(delay * 1000); // in milliseconds
   }
+
+  pthread_barrier_wait(&barrier); // sync those threads yo
+  pthread_cond_wait(&cond, &mutex);
 }
 
 void parse_JSON(struct sensor_bundle sensor[2], char *JSON) {
@@ -197,6 +202,9 @@ int main(int argc, char *argv[]) {
   digitalWrite(sensor[RIGHT].trigger, LOW);
 
   pthread_t thread[3]; // array of threads
+
+  pthread_cond_init(&cond, NULL);
+  pthread_mutex_init(&mutex, NULL);
   pthread_barrier_init(&barrier, NULL, 2);
 
   // this thread reads the global array and prints to stdout

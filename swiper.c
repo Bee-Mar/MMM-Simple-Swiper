@@ -105,8 +105,6 @@ void sensor_distance(struct sensor_bundle *sensor) {
 
     for (i = 0; i < NUM_SAMPLES; i++) {
 
-      pthread_barrier_wait(&barrier); // sync those threads yo
-
       digitalWrite(sensor->trigger, HIGH);
       delayMicroseconds(100);
       digitalWrite(sensor->trigger, LOW);
@@ -128,12 +126,13 @@ void sensor_distance(struct sensor_bundle *sensor) {
     // sort the values, write average to global array, then nap
     qsort(distance, NUM_SAMPLES, sizeof(float), compare);
 
+    // making sure each thread publishes at the same time
+    pthread_barrier_wait(&barrier);
     sensor_output[sensor_side] = avg(distance); // publish data to global array
-    pthread_barrier_wait(&barrier);             // sync those threads yo
 
     // tell the stdout thread to get his ass in gear
-    pthread_mutex_unlock(&mutex);
     pthread_cond_broadcast(&cond);
+    pthread_mutex_unlock(&mutex);
 
     usleep(delay * 1000); // time in milliseconds
   }

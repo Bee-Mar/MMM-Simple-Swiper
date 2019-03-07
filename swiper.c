@@ -130,11 +130,12 @@ void sensor_distance(struct sensor_bundle *sensor) {
     // sort the values, write average to global array, then nap
     qsort(distance, NUM_SAMPLES, sizeof(float), compare);
     sensor_output[sensor_side] = avg(distance);
+
+    pthread_barrier_wait(&barrier); // sync those threads yo
+    pthread_cond_wait(&cond, &mutex);
+
     usleep(delay * 1000); // in milliseconds
   }
-
-  pthread_barrier_wait(&barrier); // sync those threads yo
-  pthread_cond_wait(&cond, &mutex);
 }
 
 void parse_JSON(struct sensor_bundle sensor[2], char *JSON) {

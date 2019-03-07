@@ -2,6 +2,7 @@
 
 #include <ctype.h>
 #include <math.h>
+#include <poll.h>
 #include <pthread.h>
 #include <sched.h>
 #include <signal.h>
@@ -22,7 +23,6 @@
 #define RIGHT 1
 #define NUM_SAMPLES 10
 #define DEBUG 3
-#define CLEAR -10000.0
 
 #if defined(DEBUG) && DEBUG > 0
 #define DEBUG_PRINT(fmt, args...)                                              \
@@ -32,11 +32,11 @@
 #define DEBUG_PRINT(fmt, args...)
 #endif
 
-float sensor_output[2] = {CLEAR, CLEAR};
+float sensor_output[2] = {-10000.0, -10000.0};
 
-pthread_barrier_t barrier;
 pthread_cond_t cond;
 pthread_mutex_t mutex;
+pthread_barrier_t barrier;
 
 int STDOUT_THREAD_READY = 0;
 
@@ -78,16 +78,12 @@ void stdout_handler() {
   STDOUT_THREAD_READY = 1;
 
   while (1) {
-    if (sensor_output[LEFT] != CLEAR && sensor_output[RIGHT] != CLEAR) {
 
-      printf("%f:%f", sensor_output[0], sensor_output[1]);
-      fflush(stdout);
+    // only wake the thread when we need to actually do something
+    pthread_cond_wait(&cond, &mutex);
 
-      sensor_output[LEFT] = sensor_output[RIGHT] = CLEAR;
-
-      pthread_cond_broadcast(&cond);
-      pthread_mutex_unlock(&mutex);
-    }
+    printf("%f:%f\n", sensor_output[0], sensor_output[1]);
+    fflush(stdout);
   }
 }
 
@@ -109,6 +105,8 @@ void sensor_distance(struct sensor_bundle *sensor) {
 
     for (i = 0; i < NUM_SAMPLES; i++) {
 
+      pthread_barrier_wait(&barrier); // sync those threads yo
+
       digitalWrite(sensor->trigger, HIGH);
       delayMicroseconds(100);
       digitalWrite(sensor->trigger, LOW);
@@ -129,12 +127,15 @@ void sensor_distance(struct sensor_bundle *sensor) {
 
     // sort the values, write average to global array, then nap
     qsort(distance, NUM_SAMPLES, sizeof(float), compare);
-    sensor_output[sensor_side] = avg(distance);
 
-    pthread_barrier_wait(&barrier); // sync those threads yo
-    pthread_cond_wait(&cond, &mutex);
+    sensor_output[sensor_side] = avg(distance); // publish data to global array
+    pthread_barrier_wait(&barrier);             // sync those threads yo
 
-    usleep(delay * 1000); // in milliseconds
+    // tell the stdout thread to get his ass in gear
+    pthread_mutex_unlock(&mutex);
+    pthread_cond_broadcast(&cond);
+
+    usleep(delay * 1000); // time in milliseconds
   }
 }
 
@@ -202,7 +203,7 @@ int main(int argc, char *argv[]) {
   digitalWrite(sensor[LEFT].trigger, LOW);
   digitalWrite(sensor[RIGHT].trigger, LOW);
 
-  pthread_t thread[3]; // array of threads
+  pthread_t thread[3];
 
   pthread_cond_init(&cond, NULL);
   pthread_mutex_init(&mutex, NULL);
@@ -219,6 +220,7 @@ int main(int argc, char *argv[]) {
   pthread_create(&thread[0], NULL, (void *)sensor_distance, &sensor[0]);
   pthread_create(&thread[1], NULL, (void *)sensor_distance, &sensor[1]);
 
+  // i mean, realistically, this’ll probably never be reached, but whatever
   int i;
 
   for (i = 0; i < 3; i++) {

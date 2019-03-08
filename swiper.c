@@ -132,7 +132,7 @@ void sensor_distance(struct sensor_bundle *sensor) {
     sensor_output[sensor_side] = avg(distance); // publish data to global array
 
     // tell the stdout thread to get his ass in gear
-    pthread_cond_broadcast(&cond);
+    pthread_cond_signal(&cond);
 
     usleep(delay * 1000); // time in milliseconds
   }

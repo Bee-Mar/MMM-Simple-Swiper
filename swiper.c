@@ -78,12 +78,13 @@ void stdout_handler() {
   STDOUT_THREAD_READY = 1;
 
   while (1) {
-
     // only wake the thread when we need to actually do something
+    pthread_mutex_lock(&mutex);
     pthread_cond_wait(&cond, &mutex);
 
     printf("%f:%f\n", sensor_output[0], sensor_output[1]);
     fflush(stdout);
+    pthread_mutex_unlock(&mutex);
   }
 }
 
@@ -132,7 +133,6 @@ void sensor_distance(struct sensor_bundle *sensor) {
 
     // tell the stdout thread to get his ass in gear
     pthread_cond_broadcast(&cond);
-    pthread_mutex_unlock(&mutex);
 
     usleep(delay * 1000); // time in milliseconds
   }

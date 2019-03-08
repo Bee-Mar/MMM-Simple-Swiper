@@ -39,12 +39,12 @@ pthread_mutex_t mutex;
 pthread_barrier_t barrier;
 
 int STDOUT_THREAD_READY = 0;
+int sensor_delay = 750;
 
 struct sensor_bundle {
   int trigger;
   int echo;
   int signal;
-  float delay;
   int side;
 };
 
@@ -80,6 +80,7 @@ void stdout_handler() {
   while (1) {
     // only wake the thread when we need to actually do something
     pthread_mutex_lock(&mutex);
+
     pthread_cond_wait(&cond, &mutex);
 
     printf("%f:%f\n", sensor_output[0], sensor_output[1]);
@@ -92,11 +93,9 @@ void sensor_distance(struct sensor_bundle *sensor) {
 
   int i = 0; // loop counter
 
-  int delay = sensor->delay; // to prevent re-reading the same struct
-  int sensor_side = sensor->side;
-
   float distance[NUM_SAMPLES];
   long int start = 0, end = 0, elapsed = 0;
+  float prev_dist = -1000.0, curr_dist = 0;
 
   while (1) {
 
@@ -128,13 +127,17 @@ void sensor_distance(struct sensor_bundle *sensor) {
     qsort(distance, NUM_SAMPLES, sizeof(float), compare);
 
     // making sure each thread publishes at the same time
+    curr_dist = avg(distance);
+
     pthread_barrier_wait(&barrier);
-    sensor_output[sensor_side] = avg(distance); // publish data to global array
+    sensor_output[sensor->side] = curr_dist; // publish data to global array
 
-    // tell the stdout thread to get his ass in gear
-    pthread_cond_signal(&cond);
+    if (fabs(curr_dist - prev_dist) > 20.0) {
+      pthread_cond_signal(&cond);
+    }
 
-    usleep(delay * 1000); // time in milliseconds
+    prev_dist = curr_dist;
+    usleep(sensor_delay * 1000); // time in milliseconds
   }
 }
 
@@ -161,7 +164,7 @@ void parse_JSON(struct sensor_bundle sensor[2], char *JSON) {
         sensor[side].echo = atoi(config_value);
       } else if (strstr(config_type, "delay")) {
         DEBUG_PRINT("DELAY: %d\n", atoi(config_value));
-        sensor[side].delay = atoi(config_value);
+        sensor_delay = atoi(config_value);
       }
 
       // clear the entire array so no extra chars f--k it up

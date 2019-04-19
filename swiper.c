@@ -22,7 +22,6 @@
 #define LEFT 0
 #define RIGHT 1
 #define NUM_SAMPLES 10
-#define DEBUG 3
 
 #if defined(DEBUG) && DEBUG > 0
 #define DEBUG_PRINT(fmt, args...)                                              \
@@ -32,20 +31,23 @@
 #define DEBUG_PRINT(fmt, args...)
 #endif
 
-float sensor_output[2] = {-10000.0, -10000.0};
+float SENSOR_OUTPUT[2] = {-10000.0, -10000.0};
 
-pthread_cond_t cond;
-pthread_mutex_t mutex;
-pthread_barrier_t barrier;
+pthread_cond_t COND;
+pthread_mutex_t MUTEX;
+pthread_barrier_t BARR_TOP, BARR_BOT;
 
-int STDOUT_THREAD_READY = 0;
-int sensor_delay = 750;
+int STDOUT_THRD_READY = 0;
+int SENSOR_DELAY = 1250, THRTL_SENSOR = 1, THRTL_DELAY = 0;
+int MAX_DELAY = 4000;
+int INACT_CNT[2] = {0, 0};
 
 struct sensor_bundle {
   int trigger;
   int echo;
   int signal;
   int side;
+  int thrtl_delay;
 };
 
 void signal_catcher(int sig) {
@@ -60,6 +62,8 @@ void error_msg(char *msg) {
   exit(-1);
 }
 
+int max(int a, int b) { return a > b ? a : b; }
+
 int compare(const void *a, const void *b) { return (*(int *)a) - (*(int *)b); }
 
 float avg(float vals[NUM_SAMPLES]) {
@@ -70,22 +74,24 @@ float avg(float vals[NUM_SAMPLES]) {
   for (i = 0; i < NUM_SAMPLES / 2; i++)
     sum += vals[i];
 
-  return sum / (NUM_SAMPLES / 2);
+  return (sum / (NUM_SAMPLES / 2));
 }
 
 void stdout_handler() {
 
-  STDOUT_THREAD_READY = 1;
+  STDOUT_THRD_READY = 1;
 
   while (1) {
     // only wake the thread when we need to actually do something
-    pthread_mutex_lock(&mutex);
+    pthread_cond_wait(&COND, &MUTEX);
 
-    pthread_cond_wait(&cond, &mutex);
+    // give the thread the mutex that's required
+    pthread_mutex_lock(&MUTEX);
+    DEBUG_PRINT("STDOUT Thread received signal\n");
+    printf("%f:%f\n", SENSOR_OUTPUT[0], SENSOR_OUTPUT[1]);
 
-    printf("%f:%f\n", sensor_output[0], sensor_output[1]);
     fflush(stdout);
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&MUTEX);
   }
 }
 
@@ -103,6 +109,10 @@ void sensor_distance(struct sensor_bundle *sensor) {
     end = (long int)time(NULL);
     elapsed = 0;
 
+    DEBUG_PRINT("Thread %d at top barrier\n", sensor->side);
+
+    pthread_barrier_wait(&BARR_TOP);
+
     for (i = 0; i < NUM_SAMPLES; i++) {
 
       digitalWrite(sensor->trigger, HIGH);
@@ -118,32 +128,65 @@ void sensor_distance(struct sensor_bundle *sensor) {
       }
 
       elapsed = end - start;
-      elapsed = end - start;
 
       distance[i] = elapsed / 58;
     }
 
     // sort the values, write average to global array, then nap
     qsort(distance, NUM_SAMPLES, sizeof(float), compare);
-
-    // making sure each thread publishes at the same time
     curr_dist = avg(distance);
 
-    pthread_barrier_wait(&barrier);
-    sensor_output[sensor->side] = curr_dist; // publish data to global array
+    // getting each thread to publish at the same time
+    DEBUG_PRINT("Thread %d at bottom barrier\n", sensor->side);
+    pthread_barrier_wait(&BARR_BOT);
+    SENSOR_OUTPUT[sensor->side] = curr_dist; // publish data to global array
 
     if (fabs(curr_dist - prev_dist) > 20.0) {
-      pthread_cond_signal(&cond);
+      // only let the STDOUT thread run when it’s needed
+      pthread_cond_signal(&COND);
+      INACT_CNT[sensor->side] = sensor->thrtl_delay = 0;
+    } else {
+      INACT_CNT[sensor->side]++;
+
+      if (sensor->side == RIGHT) {
+        INACT_CNT[LEFT] = INACT_CNT[RIGHT] =
+            max(INACT_CNT[LEFT], INACT_CNT[RIGHT]);
+      }
     }
 
     prev_dist = curr_dist;
-    usleep(sensor_delay * 1000); // time in milliseconds
+
+    if (THRTL_SENSOR && INACT_CNT[sensor->side] > 0 &&
+        INACT_CNT[sensor->side] % 10 == 0) {
+
+      if (sensor->thrtl_delay < MAX_DELAY) {
+        sensor->thrtl_delay += 125; // add a quarter second
+      } else {
+        sensor->thrtl_delay = MAX_DELAY;
+      }
+    }
+
+    DEBUG_PRINT("Thread %d thrtl_delay = %d\n", sensor->side,
+                sensor->thrtl_delay);
+    DEBUG_PRINT("Thread %d INACT_CNT = %d\n", sensor->side,
+                INACT_CNT[sensor->side]);
+
+    usleep((SENSOR_DELAY + sensor->thrtl_delay) * 1000);
+
+    // this may be removed
+    if (THRTL_SENSOR && INACT_CNT[sensor->side] > 0 &&
+        INACT_CNT[sensor->side] % 125 == 0) {
+      // try resetting page to home page after a while in here, if they want
+      DEBUG_PRINT("Resetting to home page\n");
+    }
   }
 }
 
 void parse_JSON(struct sensor_bundle sensor[2], char *JSON) {
-  int len = strlen(JSON) + 1;
+
   char config_type[20], config_value[15], curr_char;
+
+  int len = strlen(JSON) + 1;
   int j = 0, k = 0, i = 0; // counters and shit
   int side;
 
@@ -152,24 +195,35 @@ void parse_JSON(struct sensor_bundle sensor[2], char *JSON) {
 
     if (isalpha(curr_char)) {
       config_type[j++] = curr_char;
+
     } else if (isdigit(curr_char)) {
       config_value[k++] = curr_char;
+
     } else if (curr_char == ',' || curr_char == '}') {
 
       side = strstr(config_type, "right") ? RIGHT : LEFT;
 
       if (strstr(config_type, "trigger")) {
         sensor[side].trigger = atoi(config_value);
+
       } else if (strstr(config_type, "echo")) {
         sensor[side].echo = atoi(config_value);
+
       } else if (strstr(config_type, "delay")) {
         DEBUG_PRINT("DELAY: %d\n", atoi(config_value));
-        sensor_delay = atoi(config_value);
+        SENSOR_DELAY = atoi(config_value);
+
+      } else if (strstr(config_type, "throttleSensor")) {
+        THRTL_SENSOR = (strstr(config_value, "true") ? 1 : 0);
+
+      } else if (strstr(config_type, "maxDelay")) {
+        MAX_DELAY = atoi(config_value);
       }
 
       // clear the entire array so no extra chars f--k it up
       memset(config_type, 0, sizeof(config_type));
       memset(config_value, 0, sizeof(config_value));
+
       k = j = 0;
     }
   }
@@ -192,6 +246,8 @@ int main(int argc, char *argv[]) {
   // yeah, this seems dumb, but it’s used within the "sensor_distance" function
   sensor[LEFT].side = LEFT;
   sensor[RIGHT].side = RIGHT;
+  sensor[LEFT].thrtl_delay = 0;
+  sensor[RIGHT].thrtl_delay = 0;
 
   // setting up the pins and stuff
   wiringPiSetupGpio();
@@ -207,20 +263,21 @@ int main(int argc, char *argv[]) {
 
   pthread_t thread[3];
 
-  pthread_cond_init(&cond, NULL);
-  pthread_mutex_init(&mutex, NULL);
-  pthread_barrier_init(&barrier, NULL, 2);
+  pthread_cond_init(&COND, NULL);
+  pthread_mutex_init(&MUTEX, NULL);
+  pthread_barrier_init(&BARR_TOP, NULL, 2);
+  pthread_barrier_init(&BARR_BOT, NULL, 2);
 
   // this thread reads the global array and prints to stdout
   pthread_create(&thread[2], NULL, (void *)stdout_handler, NULL);
 
   // to guarantee the stdout handler thread gets started first
   do { /* pass */
-  } while (!STDOUT_THREAD_READY);
+  } while (!STDOUT_THRD_READY);
 
   // running two threads indefinitely to calculate the distance of each sensor
-  pthread_create(&thread[0], NULL, (void *)sensor_distance, &sensor[0]);
-  pthread_create(&thread[1], NULL, (void *)sensor_distance, &sensor[1]);
+  pthread_create(&thread[LEFT], NULL, (void *)sensor_distance, &sensor[LEFT]);
+  pthread_create(&thread[RIGHT], NULL, (void *)sensor_distance, &sensor[RIGHT]);
 
   // i mean, realistically, this’ll probably never be reached, but whatever
   int i;
@@ -229,7 +286,8 @@ int main(int argc, char *argv[]) {
     pthread_join(thread[i], NULL);
   }
 
-  pthread_barrier_destroy(&barrier);
+  pthread_barrier_destroy(&BARR_TOP);
+  pthread_barrier_destroy(&BARR_BOT);
 
   return 0;
 }

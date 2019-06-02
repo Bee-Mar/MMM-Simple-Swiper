@@ -1,7 +1,9 @@
-LDFLAGS = -lpthread -lwiringPi -lm -lrt -lcrypt
+LDFLAGS = -lwiringPi -lm -lrt -lcrypt -lboost_system -lboost_thread -lpthread
 OBJS = main.o swiper.o Sensor.o
 CFLAGS = -o
 CC = g++
+VERSION = -std=c++11
+CC += $(VERSION)
 
 all: build_depends main
 

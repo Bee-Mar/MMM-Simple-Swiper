@@ -1,10 +1,9 @@
 #include "swiper.h"
 #include "Sensor.h"
 
-pthread_cond_t COND;
-pthread_mutex_t MUTEX;
-pthread_barrier_t BARR_TOP, BARR_BOT;
-
+boost::mutex mutex;
+boost::unique_lock<boost::mutex> lock(mutex);
+boost::condition_variable condition;
 bool STDOUT_THRD_READY = false;
 
 int SENSOR_DELAY = 1250;
@@ -46,29 +45,25 @@ void stdoutHandler(void) {
   STDOUT_THRD_READY = true;
 
   while (1) {
-    // only wake the thread when we need to actually do something
-    pthread_cond_wait(&COND, &MUTEX);
+    // wake the thread when we need to print the output to node_helper.js
+    lock.lock();
+    condition.wait(lock);
 
-    // print the output to the parent process in node_helper.js
-    pthread_mutex_lock(&MUTEX);
     DEBUG_PRINT("STDOUT Thread received signal\n");
-
     std::cout << SENSOR_OUTPUT[0] << ":" << SENSOR_OUTPUT[1] << std::endl;
 
-    // shouldn't need the fflush anymore with std::endl;
-    // fflush(stdout);
-    pthread_mutex_unlock(&MUTEX);
+    lock.unlock();
   }
 }
 
 // NEED TO TRANSLATE THIS TO C++
-void sensorDistance(Sensor &sensor) {
+void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
 
-  int i = 0;
   std::array<float, NUM_SAMPLES> distance;
 
-  float prev_dist = -1000.0, curr_dist = 0;
+  int i = 0;
   long int start = 0, end = 0, elapsed = 0;
+  float prev_dist = -1000.0, curr_dist = 0;
 
   while (1) {
     start = (long int)time(NULL);
@@ -76,9 +71,6 @@ void sensorDistance(Sensor &sensor) {
     elapsed = 0;
 
     DEBUG_PRINT("Thread %d at top barrier\n", sensor.side);
-
-    // probably unnecessary to have this barrier
-    // pthread_barrier_wait(&BARR_TOP);
 
     for (i = 0; i < NUM_SAMPLES; i++) {
       digitalWrite(sensor.trigger, HIGH);
@@ -108,11 +100,12 @@ void sensorDistance(Sensor &sensor) {
     SENSOR_OUTPUT[sensor.side] = curr_dist;
 
     DEBUG_PRINT("Thread %d at bottom barrier\n", sensor.side);
-    pthread_barrier_wait(&BARR_BOT);
 
-    if (fabs(curr_dist - prev_dist) > 20.0) {
+    barrier.wait();
+
+    if (std::fabs(curr_dist - prev_dist) > 20.0) {
       // signal the STDOUT thread and reset the inactive counts for the threads
-      pthread_cond_signal(&COND);
+      condition.notify_one();
       INACT_CNT[sensor.side] = sensor.throttleDelay = 0;
 
     } else {
@@ -126,10 +119,9 @@ void sensorDistance(Sensor &sensor) {
     }
 
     prev_dist = curr_dist;
-
     // this whole thing might just get removed
     // make sure both threads get the same inactive count
-    pthread_barrier_wait(&BARR_TOP);
+    barrier.wait();
 
     if (THRTL_SENSOR && INACT_CNT[sensor.side] > 0 &&
         INACT_CNT[sensor.side] % 10 == 0) {

@@ -57,11 +57,12 @@
    (I certainly hope you're picking up on our sarcastic demeanors by this
    point.)
 
-   | Library Dependencies | Link                                         |
-   |----------------------+----------------------------------------------|
-   | WiringPi             | https://git.drogon.net/                      |
-   | child_process        | https://nodejs.org/api/child_process.html    |
-   | electron-rebuild     | https://github.com/electron/electron-rebuild |
+   | Library Dependencies | Installation                          | Link                                         |
+   |----------------------+---------------------------------------+----------------------------------------------|
+   | WiringPi             | (Handled within Makefile)             | https://git.drogon.net/                      |
+   | child_process        | (Handled with ~npm install~)          | https://nodejs.org/api/child_process.html    |
+   | electron-rebuild     | (Handled with ~npm install~)          | https://github.com/electron/electron-rebuild |
+   | boost                | sudo apt-get install libboost-all-dev | https://www.boost.org/                       |
 
 
    | Recommended MagicMirror Modules | Link                                              |
@@ -87,14 +88,13 @@
    MagicMirror along with our module.
 
 #+BEGIN_SRC sh
-  cd ~/MagicMirror/modules/
+cd ~/MagicMirror/modules/
 
-  git clone https://github.com/Bee-Mar/MMM-Simple-Swiper.git
+git clone https://github.com/Bee-Mar/MMM-Simple-Swiper.git
 
-  cd MMM-Simple-Swiper
+cd MMM-Simple-Swiper
 
-  make build_depends && make
-
+make -j4
 #+END_SRC
 ** SuDON'T
 

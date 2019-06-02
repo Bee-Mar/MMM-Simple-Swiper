@@ -30,35 +30,30 @@ int main(int argc, char *argv[]) {
   digitalWrite(sensor[LEFT].trigger, LOW);
   digitalWrite(sensor[RIGHT].trigger, LOW);
 
-  std::thread threads[3];
+  boost::thread threads[3];
 
   // NEED TO TRANSLATE THIS TO C++
 
   // pthread_cond_init(&COND, NULL);
   // pthread_mutex_init(&MUTEX, NULL);
-  // pthread_barrier_init(&BARR_TOP, NULL, 2);
-  // pthread_barrier_init(&BARR_BOT, NULL, 2);
 
   // this thread reads the global array and prints to stdout
-  // pthread_create(&thread[2], NULL, (void *)stdoutHandler, NULL);
-
-  threads[2] = std::thread(stdoutHandler);
+  threads[2] = boost::thread(boost::bind(&stdoutHandler));
 
   busyWaitForStdoutThread();
 
-  threads[LEFT] = std::thread(sensorDistance, std::ref(sensor[LEFT]));
-  threads[RIGHT] = std::thread(sensorDistance, std::ref(sensor[RIGHT]));
+  boost::barrier barrier(2);
+
+  threads[LEFT] = boost::thread(boost::bind(
+      &sensorDistance, boost::ref(sensor[LEFT]), boost::ref(barrier)));
+
+  threads[RIGHT] = boost::thread(boost::bind(
+      sensorDistance, boost::ref(sensor[RIGHT]), boost::ref(barrier)));
 
   // i mean, realistically, this’ll never be reached, but whatever
-
   for (int i = 0; i < 3; i++) {
     threads[i].join();
   }
-
-  // NEED TO TRANSLATE THIS TO C++
-
-  // pthread_barrier_destroy(&BARR_TOP);
-  // pthread_barrier_destroy(&BARR_BOT);
 
   return 0;
 }

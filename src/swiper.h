@@ -5,7 +5,11 @@
 // converting to CPP headers
 #include "Sensor.h"
 #include <algorithm>
+#include <boost/bind.hpp>
+#include <boost/thread.hpp>
+#include <boost/thread/barrier.hpp>
 #include <cmath>
+#include <condition_variable>
 #include <csignal>
 #include <ctime>
 #include <iostream>
@@ -14,7 +18,6 @@
 
 // original C headers used
 #include <ctype.h>
-#include <math.h>
 #include <poll.h>
 #include <pthread.h>
 #include <sched.h>
@@ -28,7 +31,6 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
-#include <wiringPi.h>
 
 #define READ 0
 #define WRITE 1
@@ -56,7 +58,7 @@ void busyWaitForStdoutThread(void);
 
 void stdoutHandler(void);
 
-void sensorDistance(Sensor &sensor);
+void sensorDistance(Sensor &sensor, boost::barrier &barrier);
 
 float average(float vals[NUM_SAMPLES]);
 

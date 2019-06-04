@@ -2,9 +2,7 @@
 
 int main(int argc, char *argv[]) {
 
-  if (argc < 2) {
-    errorMsg("ERROR: No input arguments.");
-  }
+  if (argc < 2) { errorMsg("ERROR: No input arguments."); }
 
   // snatch those gnarly keyboard interrupts
   signal(SIGINT, signalCatcher);
@@ -16,7 +14,7 @@ int main(int argc, char *argv[]) {
 
   sensor[LEFT].side = LEFT;
   sensor[RIGHT].side = RIGHT;
-  sensor[LEFT].throttleDelay = sensor[RIGHT].throttleDelay = 0;
+  sensor[LEFT].delay = sensor[RIGHT].delay = 0;
 
   // setting up the pins and stuff
   wiringPiSetupGpio();
@@ -32,28 +30,22 @@ int main(int argc, char *argv[]) {
 
   boost::thread threads[3];
 
-  // NEED TO TRANSLATE THIS TO C++
-
-  // pthread_cond_init(&COND, NULL);
-  // pthread_mutex_init(&MUTEX, NULL);
-
   // this thread reads the global array and prints to stdout
   threads[2] = boost::thread(boost::bind(&stdoutHandler));
 
+  // make sure the stdout thread gets set up first
   busyWaitForStdoutThread();
 
   boost::barrier barrier(2);
 
-  threads[LEFT] = boost::thread(boost::bind(
-      &sensorDistance, boost::ref(sensor[LEFT]), boost::ref(barrier)));
+  threads[LEFT] =
+      boost::thread(boost::bind(&sensorDistance, boost::ref(sensor[LEFT]), boost::ref(barrier)));
 
-  threads[RIGHT] = boost::thread(boost::bind(
-      sensorDistance, boost::ref(sensor[RIGHT]), boost::ref(barrier)));
+  threads[RIGHT] =
+      boost::thread(boost::bind(sensorDistance, boost::ref(sensor[RIGHT]), boost::ref(barrier)));
 
   // i mean, realistically, this’ll never be reached, but whatever
-  for (int i = 0; i < 3; i++) {
-    threads[i].join();
-  }
+  for (int i = 0; i < 3; i++) { threads[i].join(); }
 
   return 0;
 }

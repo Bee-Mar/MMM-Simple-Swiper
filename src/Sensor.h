@@ -7,7 +7,7 @@ public:
   int echo;
   int signal;
   int side;
-  int throttleDelay;
+  int delay;
 
   Sensor();
   Sensor(int trigger, int echo);

@@ -1,18 +1,21 @@
 #include "swiper.h"
 #include "Sensor.h"
 
+// used for synchronization between each of the threads
 boost::mutex mutex;
 boost::unique_lock<boost::mutex> lock(mutex);
 boost::condition_variable condition;
-bool STDOUT_THRD_READY = false;
 
-int SENSOR_DELAY = 1250;
-int THRTL_SENSOR = 1;
-int THRTL_DELAY = 0;
-int MAX_DELAY = 4000;
-
+// inactive count/tracker for each sensor, and the recorded distances for each sensor
 std::array<int, 2> INACT_CNT = {0, 0};
 std::array<float, 2> SENSOR_OUTPUT = {-10000.0, -10000.0};
+
+bool THRTL_SENSOR = false;
+bool STDOUT_THRD_READY = false;
+
+int THRTL_DELAY = 0; // haven't used yet
+int SENSOR_DELAY = 1250;
+int MAX_DELAY = 4000;
 
 void signalCatcher(int sig) {
   // catch the signal and clean up
@@ -22,22 +25,18 @@ void signalCatcher(int sig) {
 }
 
 void busyWaitForStdoutThread(void) {
-  do {
-    // only called once at the start of the program to
-    // guarantee the stdout handler thread gets started first
-  } while (!STDOUT_THRD_READY);
+  // used once to guarantee the stdout handler thread gets started first
+  while (!STDOUT_THRD_READY) {}
 }
 
 float average(std::array<float, NUM_SAMPLES> vals) {
   int i = 0;
   float sum = 0.0;
 
-  // only use the first half of the values to remove extreme outliers
-  for (i = 0; i < (NUM_SAMPLES / 2); i++) {
-    sum += vals[i];
-  }
+  // only use the first half of the values to trim extreme outliers
+  for (i = 0; i < HALF_NUM_SAMPLES; i++) { sum += vals[i]; }
 
-  return (sum / (NUM_SAMPLES / 2));
+  return (sum / HALF_NUM_SAMPLES);
 }
 
 // NEED TO TRANSLATE THIS TO C++
@@ -49,7 +48,7 @@ void stdoutHandler(void) {
     lock.lock();
     condition.wait(lock);
 
-    DEBUG_PRINT("STDOUT Thread received signal\n");
+    DEBUG_PRINT("STDOUT Thread received signal from sensor threads.\n");
     std::cout << SENSOR_OUTPUT[0] << ":" << SENSOR_OUTPUT[1] << std::endl;
 
     lock.unlock();
@@ -59,9 +58,8 @@ void stdoutHandler(void) {
 // NEED TO TRANSLATE THIS TO C++
 void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
 
+  int i;
   std::array<float, NUM_SAMPLES> distance;
-
-  int i = 0;
   long int start = 0, end = 0, elapsed = 0;
   float prev_dist = -1000.0, curr_dist = 0;
 
@@ -77,19 +75,15 @@ void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
       delayMicroseconds(100);
       digitalWrite(sensor.trigger, LOW);
 
-      while (digitalRead(sensor.echo) == LOW) {
-        // do nothing until the read changes
-      }
-
+      // do nothing until the read changes
+      while (digitalRead(sensor.echo) == LOW) {}
       start = micros();
 
-      while (digitalRead(sensor.echo) == HIGH) {
-        // do nothing until the read changes
-      }
-
+      while (digitalRead(sensor.echo) == HIGH) {}
       end = micros();
+
       elapsed = end - start;
-      distance.at(i) = elapsed / 58;
+      distance.at(i) = (elapsed / 58);
     }
 
     // sort the values, then write average to global array
@@ -106,56 +100,43 @@ void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
     if (std::fabs(curr_dist - prev_dist) > 20.0) {
       // signal the STDOUT thread and reset the inactive counts for the threads
       condition.notify_one();
-      INACT_CNT[sensor.side] = sensor.throttleDelay = 0;
+      INACT_CNT[sensor.side] = sensor.delay = 0;
 
     } else {
       INACT_CNT[sensor.side]++;
 
-      // the max function is an inline
       if (sensor.side == RIGHT) {
-        INACT_CNT[LEFT] = INACT_CNT[RIGHT] =
-            std::max(INACT_CNT[LEFT], INACT_CNT[RIGHT]);
+        // take the maximum of the recorded delays and assign it to both sensors
+        INACT_CNT[LEFT] = INACT_CNT[RIGHT] = std::max(INACT_CNT[LEFT], INACT_CNT[RIGHT]);
       }
     }
 
     prev_dist = curr_dist;
-    // this whole thing might just get removed
-    // make sure both threads get the same inactive count
     barrier.wait();
 
-    if (THRTL_SENSOR && INACT_CNT[sensor.side] > 0 &&
-        INACT_CNT[sensor.side] % 10 == 0) {
-
-      if (sensor.throttleDelay < MAX_DELAY) {
-        sensor.throttleDelay += 125; // add an eighth second
-      } else {
-        sensor.throttleDelay = MAX_DELAY;
-      }
+    // short circuit the if statement if the THRTL_SENSOR is set to false
+    if (THRTL_SENSOR && (INACT_CNT[sensor.side] > 0) && (INACT_CNT[sensor.side] % 10 == 0)) {
+      // add an eighth of a second if we haven't hit MAX_DELAY
+      sensor.delay = (sensor.delay < MAX_DELAY) ? (sensor.delay + 125) : (MAX_DELAY);
     }
 
-    DEBUG_PRINT("Thread %d throttleDelay = %d\n", sensor.side,
-                sensor.throttleDelay);
-    DEBUG_PRINT("Thread %d INACT_CNT = %d\n", sensor.side,
-                INACT_CNT[sensor.side]);
+    DEBUG_PRINT("Thread %d throttleDelay = %d\n", sensor.side, sensor.delay);
+    DEBUG_PRINT("Thread %d INACT_CNT = %d\n", sensor.side, INACT_CNT[sensor.side]);
 
-    // this may be removed
-    if (THRTL_SENSOR && INACT_CNT[sensor.side] > 0 &&
-        INACT_CNT[sensor.side] % 125 == 0) {
-      // try resetting page to home page after a while in here, if they want
-      DEBUG_PRINT("Resetting to home page\n");
-    }
+    // this may be removed entirely
+    // if (THRTL_SENSOR && (INACT_CNT[sensor.side] > 0) && (INACT_CNT[sensor.side] % 125 == 0)) {
+    //   // try resetting page to home page after a while in here, if they want
+    //   DEBUG_PRINT("Resetting to home page\n");
+    // }
 
-    usleep((SENSOR_DELAY + sensor.throttleDelay) * 1000);
+    usleep((SENSOR_DELAY + sensor.delay) * 1000);
   }
 }
 
 void parseJSON(Sensor sensor[2], char *JSON) {
-
-  std::string configType, configValue;
   char currChar;
-
-  int len = strlen(JSON) + 1;
-  int i = 0, side;
+  std::string configType, configValue;
+  int i, side, len = strlen(JSON) + 1;
 
   for (i = 0; i < len; i++) {
     currChar = tolower(JSON[i]);
@@ -180,7 +161,7 @@ void parseJSON(Sensor sensor[2], char *JSON) {
         SENSOR_DELAY = std::stoi(configValue);
 
       } else if (configType.find("throttleSensor")) {
-        THRTL_SENSOR = configValue.find("true") ? 1 : 0;
+        THRTL_SENSOR = configValue.find("true") ? true : false;
 
       } else if (configType.find("maxDelay")) {
         MAX_DELAY = std::stoi(configValue);

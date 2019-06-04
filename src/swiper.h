@@ -22,11 +22,11 @@
 #define LEFT 0
 #define RIGHT 1
 #define NUM_SAMPLES 10
+#define HALF_NUM_SAMPLES (NUM_SAMPLES / 2)
 
 #if defined(DEBUG) && DEBUG > 0
-#define DEBUG_PRINT(fmt, args...)                                              \
-  fprintf(stderr, "DEBUG_MODE: %s:%d:%s(): " fmt, __FILE__, __LINE__,          \
-          __func__, ##args)
+#define DEBUG_PRINT(fmt, args...)                                                                  \
+  fprintf(stderr, "DEBUG_MODE: %s:%d:%s(): " fmt, __FILE__, __LINE__, __func__, ##args)
 #else
 #define DEBUG_PRINT(fmt, args...)
 #endif

@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
       boost::thread(boost::bind(sensorDistance, boost::ref(sensor[RIGHT]), boost::ref(barrier)));
 
   // i mean, realistically, this’ll never be reached, but whatever
-  for (int i = 0; i < 3; i++) { threads[i].join(); }
+  for (int i{0}; i < 3; i++) { threads[i].join(); }
 
   return 0;
 }

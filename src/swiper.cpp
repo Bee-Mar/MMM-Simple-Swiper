@@ -10,12 +10,12 @@ boost::condition_variable condition;
 std::array<int, 2> INACT_CNT = {0, 0};
 std::array<float, 2> SENSOR_OUTPUT = {-10000.0, -10000.0};
 
-bool THRTL_SENSOR = false;
-bool STDOUT_THRD_READY = false;
+bool THRTL_SENSOR{false};
+bool STDOUT_THRD_READY{false};
 
-int THRTL_DELAY = 0; // haven't used yet
-int SENSOR_DELAY = 1250;
-int MAX_DELAY = 4000;
+int THRTL_DELAY{0}; // haven't used yet
+int SENSOR_DELAY{1250};
+int MAX_DELAY{4000};
 
 void signalCatcher(int sig) {
   // catch the signal and clean up
@@ -30,11 +30,11 @@ void busyWaitForStdoutThread(void) {
 }
 
 float average(std::array<float, NUM_SAMPLES> vals) {
-  int i = 0;
-  float sum = 0.0;
+  int i{0};
+  float sum{0};
 
   // only use the first half of the values to trim extreme outliers
-  for (i = 0; i < HALF_NUM_SAMPLES; i++) { sum += vals[i]; }
+  for (i; i < HALF_NUM_SAMPLES; i++) { sum += vals[i]; }
 
   return (sum / HALF_NUM_SAMPLES);
 }
@@ -58,10 +58,11 @@ void stdoutHandler(void) {
 // NEED TO TRANSLATE THIS TO C++
 void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
 
-  int i;
   std::array<float, NUM_SAMPLES> distance;
-  long int start = 0, end = 0, elapsed = 0;
-  float prev_dist = -1000.0, curr_dist = 0;
+
+  int i{0};
+  long int start{0}, end{0}, elapsed{0};
+  float prev_dist{-1000.0}, curr_dist{0};
 
   while (1) {
     start = (long int)time(NULL);
@@ -70,7 +71,7 @@ void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
 
     DEBUG_PRINT("Thread %d at top barrier\n", sensor.side);
 
-    for (i = 0; i < NUM_SAMPLES; i++) {
+    for (i; i < NUM_SAMPLES; i++) {
       digitalWrite(sensor.trigger, HIGH);
       delayMicroseconds(100);
       digitalWrite(sensor.trigger, LOW);
@@ -134,11 +135,14 @@ void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
 }
 
 void parseJSON(Sensor sensor[2], char *JSON) {
-  char currChar;
-  std::string configType, configValue;
-  int i, side, len = strlen(JSON) + 1;
 
-  for (i = 0; i < len; i++) {
+  std::string configType, configValue;
+
+  int i{0}, side{0}, len(strlen(JSON) + 1);
+
+  char currChar(tolower(JSON[i]));
+
+  for (i; i < len; i++) {
     currChar = tolower(JSON[i]);
 
     if (isalpha(currChar)) {

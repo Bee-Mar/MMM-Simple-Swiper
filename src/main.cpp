@@ -1,13 +1,15 @@
 #include "swiper.h"
+#include <fstream>
 
 int main(int argc, char *argv[]) {
 
-#if DEBUG
-  std::string debugArgs(
-      "{echoLeftPin: 24, triggerLeftPin: 23, echoRightPin: 26, triggerRightPin: 25, threshold: "
-      "175, distanceDiff: 1.25, debug: false, delay: 500, sensorThrottling: true, maxDelay: 2000}");
+#ifdef DEBUG
+  std::ifstream debugFile("debug_parameters.json");
 
-  char *debugJSON = const_cast<char *>(debugArgs.c_str());
+  std::string debugArgs((std::istreambuf_iterator<char>(debugFile)),
+                        (std::istreambuf_iterator<char>()));
+
+  char *debugJSON(const_cast<char *>(debugArgs.c_str()));
 
 #else
   if (argc < 2) { errorMsg("ERROR: No input arguments."); }
@@ -20,7 +22,7 @@ int main(int argc, char *argv[]) {
 
   // read and parse the config passed over from MMM-simple-swiper.js
   parseJSON(sensor,
-#if DEBUG
+#ifdef DEBUG
             debugJSON
 #else
             argv[1]
@@ -32,6 +34,19 @@ int main(int argc, char *argv[]) {
 
   sensor[RIGHT].setSide(RIGHT);
   sensor[RIGHT].setDelay(0);
+
+#ifdef DEBUG
+  std::cout << "Sensor initialization details:" << std::endl;
+  std::cout << "==============================" << std::endl;
+
+#pragma unroll
+  for (int i{0}; i < 2; i++) {
+    std::cout << "Side = " << (sensor[i].side() == LEFT ? "LEFT" : "RIGHT") << std::endl;
+    std::cout << "Echo pin = " << sensor[i].echoPin() << std::endl;
+    std::cout << "Trigger pin = " << sensor[i].triggerPin() << std::endl;
+    std::cout << "\n" << std::endl;
+  }
+#endif
 
   // setting up the pins and stuff
   wiringPiSetupGpio();

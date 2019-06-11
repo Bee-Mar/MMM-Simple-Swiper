@@ -24,11 +24,11 @@
 #define NUM_SAMPLES 10
 #define HALF_NUM_SAMPLES (NUM_SAMPLES / 2)
 
-#if defined(DEBUG) && DEBUG > 0
-#define DEBUG_PRINT(fmt, args...)                                                                  \
-  fprintf(stderr, "DEBUG_MODE: %s:%d:%s(): " fmt, __FILE__, __LINE__, __func__, ##args)
+#if defined(DEBUG)
+#define DEBUG_FPRINTF(fmt, args...)                                                                \
+  fprintf(stderr, "DEBUG MODE: %s:%d:%s(): " fmt, __FILE__, __LINE__, __func__, ##args)
 #else
-#define DEBUG_PRINT(fmt, args...)
+#define DEBUG_FPRINTF(fmt, args...)
 #endif
 
 void signalCatcher(int sig);

@@ -11,7 +11,7 @@ all: build_depends main
 # modify the compile flags then, build if using debug
 debug: CFLAGS = -g -o
 debug: SUB_CFLAGS = -g -c
-debug: LDFLAGS += -DEBUG
+debug: LDFLAGS += -DDEBUG
 
 debug: build_depends main
 

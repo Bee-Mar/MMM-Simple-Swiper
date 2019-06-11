@@ -46,7 +46,7 @@ void stdoutHandler(void) {
     lock.lock();
     condition.wait(lock);
 
-    DEBUG_PRINT("STDOUT Thread received signal from sensor threads.\n");
+    DEBUG_FPRINTF("STDOUT Thread received signal from sensor threads.\n");
     std::cout << SENSOR_OUTPUT[0] << ":" << SENSOR_OUTPUT[1] << std::endl;
 
     lock.unlock();
@@ -65,7 +65,7 @@ void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
     end = (long int)time(NULL);
     elapsed = 0;
 
-    DEBUG_PRINT("Thread %d at top barrier\n", sensor.side);
+    DEBUG_FPRINTF("Thread %d at top barrier\n", sensor.side());
 
     for (int i{0}; i < NUM_SAMPLES; i++) {
       digitalWrite(sensor.triggerPin(), HIGH);
@@ -90,7 +90,7 @@ void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
     // write the output value to the global array for each thread
     SENSOR_OUTPUT[sensor.side()] = curr_dist;
 
-    DEBUG_PRINT("Thread %d at bottom barrier\n", sensor.side());
+    DEBUG_FPRINTF("Thread %d at bottom barrier\n", sensor.side());
 
     barrier.wait();
 
@@ -122,13 +122,13 @@ void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
       }
     }
 
-    DEBUG_PRINT("Thread %d throttleDelay = %d\n", sensor.side, sensor.delay);
-    DEBUG_PRINT("Thread %d INACT_CNT = %d\n", sensor.side, INACT_CNT[sensor.side]);
+    DEBUG_FPRINTF("Thread %d throttleDelay = %d\n", sensor.side(), sensor.delay());
+    DEBUG_FPRINTF("Thread %d INACT_CNT = %d\n", sensor.side(), INACT_CNT[sensor.side()]);
 
     // this may be removed entirely
     // if (THRTL_SENSOR && (INACT_CNT[sensor.side] > 0) && (INACT_CNT[sensor.side] % 125 == 0)) {
     //   // try resetting page to home page after a while in here, if they want
-    //   DEBUG_PRINT("Resetting to home page\n");
+    //   DEBUG_FPRINTF("Resetting to home page\n");
     // }
 
     usleep((SENSOR_DELAY + sensor.delay()) * 1000);
@@ -136,7 +136,6 @@ void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
 }
 
 void parseJSON(Sensor sensor[2], char *JSON) {
-
   std::string configType, configValue;
 
   int side{0}, len(strlen(JSON) + 1);
@@ -162,7 +161,6 @@ void parseJSON(Sensor sensor[2], char *JSON) {
         sensor[side].setEchoPin(std::stoi(configValue));
 
       } else if (configType.find("delay") != std::string::npos) {
-        DEBUG_PRINT("DELAY: %d\n", atoi(configValue));
         SENSOR_DELAY = std::stoi(configValue);
 
       } else if (configType.find("throttleSensor") != std::string::npos) {

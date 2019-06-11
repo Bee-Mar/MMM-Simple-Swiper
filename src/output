@@ -1,0 +1,2 @@
+g++ -std=c++11 -g -c swiper.cpp -lwiringPi -lm -lrt -lcrypt -lboost_system -lboost_thread -lpthread -DDEBUG
+Makefile:36: recipe for target 'swiper.o' failed

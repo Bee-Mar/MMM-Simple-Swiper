@@ -2,7 +2,16 @@
 
 int main(int argc, char *argv[]) {
 
+#if DEBUG
+  std::string debugArgs(
+      "{echoLeftPin: 24, triggerLeftPin: 23, echoRightPin: 26, triggerRightPin: 25, threshold: "
+      "175, distanceDiff: 1.25, debug: false, delay: 500, sensorThrottling: true, maxDelay: 2000}");
+
+  char *debugJSON = const_cast<char *>(debugArgs.c_str());
+
+#else
   if (argc < 2) { errorMsg("ERROR: No input arguments."); }
+#endif
 
   // snatch those gnarly keyboard interrupts
   signal(SIGINT, signalCatcher);
@@ -10,23 +19,31 @@ int main(int argc, char *argv[]) {
   Sensor sensor[2];
 
   // read and parse the config passed over from MMM-simple-swiper.js
-  parseJSON(sensor, argv[1]);
+  parseJSON(sensor,
+#if DEBUG
+            debugJSON
+#else
+            argv[1]
+#endif
+  );
 
-  sensor[LEFT].side = LEFT;
-  sensor[RIGHT].side = RIGHT;
-  sensor[LEFT].delay = sensor[RIGHT].delay = 0;
+  sensor[LEFT].setSide(LEFT);
+  sensor[LEFT].setDelay(0);
+
+  sensor[RIGHT].setSide(RIGHT);
+  sensor[RIGHT].setDelay(0);
 
   // setting up the pins and stuff
   wiringPiSetupGpio();
 
-  pinMode(sensor[LEFT].trigger, OUTPUT);
-  pinMode(sensor[RIGHT].trigger, OUTPUT);
+  pinMode(sensor[LEFT].triggerPin(), OUTPUT);
+  pinMode(sensor[RIGHT].triggerPin(), OUTPUT);
 
-  pinMode(sensor[LEFT].echo, INPUT);
-  pinMode(sensor[RIGHT].echo, INPUT);
+  pinMode(sensor[LEFT].echoPin(), INPUT);
+  pinMode(sensor[RIGHT].echoPin(), INPUT);
 
-  digitalWrite(sensor[LEFT].trigger, LOW);
-  digitalWrite(sensor[RIGHT].trigger, LOW);
+  digitalWrite(sensor[LEFT].triggerPin(), LOW);
+  digitalWrite(sensor[RIGHT].triggerPin(), LOW);
 
   boost::thread threads[3];
 
@@ -44,7 +61,8 @@ int main(int argc, char *argv[]) {
   threads[RIGHT] =
       boost::thread(boost::bind(sensorDistance, boost::ref(sensor[RIGHT]), boost::ref(barrier)));
 
-  // i mean, realistically, this’ll never be reached, but whatever
+  // realistically, this’ll never be reached, but whatever
+#pragma unroll
   for (int i{0}; i < 3; i++) { threads[i].join(); }
 
   return 0;

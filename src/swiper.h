@@ -33,7 +33,6 @@
 
 void signalCatcher(int sig);
 
-// defined within header since I made this inline
 inline void errorMsg(const std::string msg) {
   std::cout << msg << std::endl;
   exit(-1);

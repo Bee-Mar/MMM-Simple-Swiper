@@ -6,14 +6,14 @@ CC = g++
 VERSION = -std=c++11
 CC += $(VERSION)
 
-all: build_depends main
+all: build_depends mmm_simple_swiper
 
 # modify the compile flags then, build if using debug
 debug: CFLAGS = -g -o
 debug: SUB_CFLAGS = -g -c
 debug: LDFLAGS += -DDEBUG
 
-debug: build_depends main
+debug: build_depends mmm_simple_swiper
 
 build_depends:
 	@if [ ! -f /usr/local/include/wiringPi.h ]; then\
@@ -21,13 +21,13 @@ build_depends:
 		git clone git://git.drogon.net/wiringPi;\
 		cd wiringPi && ./build;\
 	fi
-	@if [ ! -d ../node_modules ]; then\
+	@if [ ! -d node_modules ]; then\
 		printf "NPM dependencies do not appear to be installed. Building NPM modules...\n";\
 		npm install; \
 	fi
 
-main: $(OBJS)
-	$(CC) $(OBJS) $(CFLAGS) main $(LDFLAGS)
+mmm_simple_swiper: $(OBJS)
+	$(CC) $(OBJS) $(CFLAGS) mmm_simple_swiper $(LDFLAGS)
 
 Sensor.o: Sensor.cpp
 	$(CC) $(SUB_CFLAGS) Sensor.cpp $(LDFLAGS)
@@ -39,4 +39,4 @@ main.o: main.cpp
 	$(CC) $(SUB_CFLAGS) main.cpp $(LDFLAGS)
 
 clean:
-	rm -rf main $(OBJS)
+	rm -rf mmm_simple_swiper $(OBJS)

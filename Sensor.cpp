@@ -18,5 +18,5 @@ int Sensor::echoPin() { return echoPinNumber; }
 int Sensor::side() { return sensorSide; }
 int Sensor::delay() { return sensorDelay; }
 
-// destructors
+// destructor
 Sensor::~Sensor() {}

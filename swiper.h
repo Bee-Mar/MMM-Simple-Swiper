@@ -12,6 +12,7 @@
 #include <condition_variable>
 #include <csignal>
 #include <ctime>
+
 #include <iostream>
 #include <sys/wait.h>
 #include <thread>
@@ -25,6 +26,8 @@
 #define HALF_NUM_SAMPLES (NUM_SAMPLES / 2)
 
 #if defined(DEBUG)
+#include <fstream>
+
 #define DEBUG_FPRINTF(fmt, args...)                                                                \
   fprintf(stderr, "DEBUG MODE: %s:%d:%s(): " fmt, __FILE__, __LINE__, __func__, ##args)
 #else

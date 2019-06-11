@@ -9,19 +9,23 @@ private:
   int sensorDelay;
 
 public:
+  // constructors
   Sensor();
   Sensor(int trigger, int echo, int side, int delay);
 
+  // setters
   void setTriggerPin(int trig);
   void setEchoPin(int echo);
   void setSide(int side);
   void setDelay(int delay);
 
+  // getters
   int triggerPin();
   int echoPin();
   int side();
   int delay();
 
+  // destructor
   virtual ~Sensor();
 };
 

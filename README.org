@@ -98,7 +98,7 @@ make -j4
 #+END_SRC
 ** SuDON'T
 
-   [[./images/checkurpriv.jpg]]
+   [[./extra/images/checkurpriv.jpg]]
 
    When running this module, there is absolutely no need to execute
    =sudo= with =npm start=. This is due to the small hack (I guess it can
@@ -123,15 +123,15 @@ this in an attempt to be transparent, and asure you no funny business
 is taking place.
 
 ** Raspberry Pi Pin Layout Reference
-   [[./images/raspberry_pi_circuit_note_fig2a.jpg]]
+   [[./extra/images/raspberry_pi_circuit_note_fig2a.jpg]]
    * Source: https://www.jameco.com/Jameco/workshop/circuitnotes/raspberry_pi_circuit_note_fig2a.jpg
 
 ** Wiring the Sensors
-   [[./images/hcsr04.png]]
+   [[./extra/images/hcsr04.png]]
    * Source: https://github.com/mochman/MMM-Swipe (shamelessly lifted)
 
 ** How we wired ours
-   [[./images/MMM-Simple-Swiper-Pin-Layout.jpg]]
+   [[./extra/images/MMM-Simple-Swiper-Pin-Layout.jpg]]
    * _IMPORTANT:_ Do not forget to add a resistor to the Echo wire. Refer to the diagram above.
 
 ** Config
@@ -229,11 +229,11 @@ is taking place.
   to email us!
 
 * Performance Demonstration
-[[./videos/MMM-Simple-Swiper-Demo.mp4]]
+[[./extra/videos/MMM-Simple-Swiper-Demo.mp4]]
 
 * Step-By-Step Instructions
 ** Screencasted Video of Installation
-   [[./videos/MMM-Simple-Swiper-Installation.mp4]]
+   [[./extra/videos/MMM-Simple-Swiper-Installation.mp4]]
 ** Before getting started...
 
    1) The demo installation was done on a _Raspberry Pi 3 B_ running
@@ -338,7 +338,7 @@ is taking place.
      cd ~/MagicMirror/modules/MMM-Simple-Swiper
 
      # ONLY DO THIS IF YOU DON’T ALREADY HAVE A CONFIG SETUP
-     cp sample-config-file/SAMPLE_CONFIG.js ~/MagicMirror/config/config.js
+     cp extra/sample-config-file/SAMPLE_CONFIG.js ~/MagicMirror/config/config.js
      # otherwise, simply examine the file, and see what is required
 
      # installing dependencies and compile executable

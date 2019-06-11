@@ -33,6 +33,8 @@
 
 void signalCatcher(int sig);
 
+inline bool substrExists(std::size_t size) { return size != std::string::npos; }
+
 inline void errorMsg(const std::string msg) {
   std::cout << msg << std::endl;
   exit(-1);

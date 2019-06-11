@@ -69,17 +69,21 @@ void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
 
     for (int i{0}; i < NUM_SAMPLES; i++) {
       digitalWrite(sensor.triggerPin(), HIGH);
+
       delayMicroseconds(100);
+
       digitalWrite(sensor.triggerPin(), LOW);
 
       // do nothing until the read changes
       while (digitalRead(sensor.echoPin()) == LOW) {}
+
       start = micros();
 
       while (digitalRead(sensor.echoPin()) == HIGH) {}
+
       end = micros();
 
-      elapsed = end - start;
+      elapsed = (end - start);
       distance.at(i) = (elapsed / 58);
     }
 
@@ -115,6 +119,7 @@ void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
     // short circuit the if statement if the THRTL_SENSOR is set to false
     if (THRTL_SENSOR && (INACT_CNT[sensor.side()] > 0) && (INACT_CNT[sensor.side()] % 10 == 0)) {
       // add an eighth of a second if we haven't hit MAX_DELAY
+
       if (sensor.delay() < MAX_DELAY) {
         sensor.setDelay(sensor.delay() + 125);
       } else {
@@ -137,13 +142,11 @@ void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
 
 void parseJSON(Sensor sensor[2], char *JSON) {
   std::string configType, configValue;
-
-  int side{0}, len(strlen(JSON) + 1);
-
-  char currChar;
+  const int len(strlen(JSON) + 1);
+  int side{0};
 
   for (int i{0}; i < len; i++) {
-    currChar = tolower(JSON[i]);
+    const char currChar(tolower(JSON[i]));
 
     if (isalpha(currChar)) {
       configType.push_back(currChar);
@@ -152,21 +155,21 @@ void parseJSON(Sensor sensor[2], char *JSON) {
       configValue.push_back(currChar);
 
     } else if (currChar == ',' || currChar == '}') {
-      side = (configType.find("right") != std::string::npos) ? RIGHT : LEFT;
+      side = (substrExists(configType.find("right")) ? RIGHT : LEFT);
 
-      if (configType.find("trigger") != std::string::npos) {
+      if (substrExists(configType.find("trigger"))) {
         sensor[side].setTriggerPin(std::stoi(configValue));
 
-      } else if (configType.find("echo") != std::string::npos) {
+      } else if (substrExists(configType.find("echo"))) {
         sensor[side].setEchoPin(std::stoi(configValue));
 
-      } else if (configType.find("delay") != std::string::npos) {
+      } else if (substrExists(configType.find("delay"))) {
         SENSOR_DELAY = std::stoi(configValue);
 
-      } else if (configType.find("throttleSensor") != std::string::npos) {
-        THRTL_SENSOR = (configType.find("true") != std::string::npos) ? true : false;
+      } else if (substrExists(configType.find("throttleSensor"))) {
+        THRTL_SENSOR = substrExists(configType.find("true"));
 
-      } else if (configType.find("maxDelay") != std::string::npos) {
+      } else if (substrExists(configType.find("maxDelay"))) {
         MAX_DELAY = std::stoi(configValue);
       }
 

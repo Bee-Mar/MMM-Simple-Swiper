@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 
   Sensor sensor[2];
 
-  // read and parse the config passed over from MMM-simple-swiper.js
+  // read and parse the config passed over from MMM-simple-swiper.js, or debug_parameters.json
   parseJSON(sensor,
 #ifdef DEBUG
             debugJSON
@@ -35,15 +35,19 @@ int main(int argc, char *argv[]) {
   sensor[RIGHT].setDelay(0);
 
 #ifdef DEBUG
-  std::cout << "Sensor initialization details:" << std::endl;
-  std::cout << "==============================" << std::endl;
+  {
+    using namespace std;
+
+    cout << "Sensor initialization details:" << endl;
+    cout << "==============================" << endl;
 
 #pragma unroll
-  for (int i{0}; i < 2; i++) {
-    std::cout << "Side = " << (sensor[i].side() == LEFT ? "LEFT" : "RIGHT") << std::endl;
-    std::cout << "Echo pin = " << sensor[i].echoPin() << std::endl;
-    std::cout << "Trigger pin = " << sensor[i].triggerPin() << std::endl;
-    std::cout << "\n" << std::endl;
+    for (int i{0}; i < 2; i++) {
+      cout << "Side = " << (sensor[i].side() == LEFT ? "LEFT" : "RIGHT") << endl;
+      cout << "Echo Pin = " << sensor[i].echoPin() << endl;
+      cout << "Trigger Pin = " << sensor[i].triggerPin() << endl;
+      cout << "\n" << endl;
+    }
   }
 #endif
 
@@ -51,29 +55,26 @@ int main(int argc, char *argv[]) {
   wiringPiSetupGpio();
 
   pinMode(sensor[LEFT].triggerPin(), OUTPUT);
-  pinMode(sensor[RIGHT].triggerPin(), OUTPUT);
-
   pinMode(sensor[LEFT].echoPin(), INPUT);
-  pinMode(sensor[RIGHT].echoPin(), INPUT);
-
   digitalWrite(sensor[LEFT].triggerPin(), LOW);
+
+  pinMode(sensor[RIGHT].triggerPin(), OUTPUT);
+  pinMode(sensor[RIGHT].echoPin(), INPUT);
   digitalWrite(sensor[RIGHT].triggerPin(), LOW);
 
   boost::thread threads[3];
 
-  // this thread reads the global array and prints to stdout
   threads[2] = boost::thread(boost::bind(&stdoutHandler));
-
-  // make sure the stdout thread gets set up first
-  busyWaitForStdoutThread();
+  busyWaitForStdoutThread(); // make sure the stdout thread gets set up first
 
   boost::barrier barrier(2);
 
-  threads[LEFT] =
-      boost::thread(boost::bind(&sensorDistance, boost::ref(sensor[LEFT]), boost::ref(barrier)));
+  {
+    using namespace boost; // just to prevent having to type out boost:: for everything here
 
-  threads[RIGHT] =
-      boost::thread(boost::bind(sensorDistance, boost::ref(sensor[RIGHT]), boost::ref(barrier)));
+    threads[0] = thread(bind(&sensorDistance, ref(sensor[LEFT]), ref(barrier)));
+    threads[1] = thread(bind(sensorDistance, ref(sensor[RIGHT]), ref(barrier)));
+  }
 
   // realistically, this’ll never be reached, but whatever
 #pragma unroll

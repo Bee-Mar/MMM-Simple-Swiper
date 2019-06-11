@@ -5,6 +5,7 @@
 // converting to CPP headers
 #include "Sensor.h"
 #include <algorithm>
+#include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/barrier.hpp>
@@ -12,7 +13,6 @@
 #include <condition_variable>
 #include <csignal>
 #include <ctime>
-
 #include <iostream>
 #include <sys/wait.h>
 #include <thread>
@@ -43,11 +43,9 @@ inline void errorMsg(const std::string msg) {
   exit(-1);
 }
 
-void busyWaitForStdoutThread(void);
-
 void stdoutHandler(void);
 
-void sensorDistance(Sensor &sensor, boost::barrier &barrier);
+void sensorDistance(Sensor &sensor);
 
 float average(float vals[NUM_SAMPLES]);
 

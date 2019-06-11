@@ -55,30 +55,22 @@ int main(int argc, char *argv[]) {
   wiringPiSetupGpio();
 
   pinMode(sensor[LEFT].triggerPin(), OUTPUT);
-  pinMode(sensor[LEFT].echoPin(), INPUT);
-  digitalWrite(sensor[LEFT].triggerPin(), LOW);
-
   pinMode(sensor[RIGHT].triggerPin(), OUTPUT);
+
+  pinMode(sensor[LEFT].echoPin(), INPUT);
   pinMode(sensor[RIGHT].echoPin(), INPUT);
+
+  digitalWrite(sensor[LEFT].triggerPin(), LOW);
   digitalWrite(sensor[RIGHT].triggerPin(), LOW);
 
-  boost::thread threads[3];
+  std::array<boost::thread, 2> threads;
 
-  threads[2] = boost::thread(boost::bind(&stdoutHandler));
-  busyWaitForStdoutThread(); // make sure the stdout thread gets set up first
+  threads[0] = boost::thread(boost::bind(&sensorDistance, boost::ref(sensor[LEFT])));
+  threads[1] = boost::thread(boost::bind(sensorDistance, boost::ref(sensor[RIGHT])));
 
-  boost::barrier barrier(2);
-
-  {
-    using namespace boost; // just to prevent having to type out boost:: for everything here
-
-    threads[0] = thread(bind(&sensorDistance, ref(sensor[LEFT]), ref(barrier)));
-    threads[1] = thread(bind(sensorDistance, ref(sensor[RIGHT]), ref(barrier)));
-  }
-
-  // realistically, this’ll never be reached, but whatever
-#pragma unroll
-  for (int i{0}; i < 3; i++) { threads[i].join(); }
+  // will never get to this point anyway
+  threads[LEFT].join();
+  threads[RIGHT].join();
 
   return 0;
 }

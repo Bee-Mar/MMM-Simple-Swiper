@@ -1,16 +1,16 @@
 #include "swiper.h"
 #include "Sensor.h"
+
 // used for synchronization between each of the threads
-boost::mutex mutex;
-boost::unique_lock<boost::mutex> lock(mutex);
-boost::condition_variable condition;
+boost::asio::io_service service;
+boost::asio::io_service::work work(service);
+boost::barrier threadBarrier(2);
 
 // inactive count/tracker for each sensor, and the recorded distances for each sensor
 std::array<int, 2> INACT_CNT = {0, 0};
 std::array<float, 2> SENSOR_OUTPUT = {-10000.0, -10000.0};
 
 bool THRTL_SENSOR{false};
-bool STDOUT_THRD_READY{false};
 
 int THRTL_DELAY{0}; // haven't used yet
 int SENSOR_DELAY{1250};
@@ -21,11 +21,6 @@ void signalCatcher(int sig) {
   std::cout << "Shutting down swiper MMM-simple-swiper." << std::endl;
   wait(0);
   exit(0);
-}
-
-void busyWaitForStdoutThread(void) {
-  // used once to guarantee the stdout handler thread gets started first
-  while (!STDOUT_THRD_READY) {}
 }
 
 float average(std::array<float, NUM_SAMPLES> vals) {
@@ -39,22 +34,10 @@ float average(std::array<float, NUM_SAMPLES> vals) {
 }
 
 void stdoutHandler(void) {
-  STDOUT_THRD_READY = true;
-
-  while (true) {
-    // wake the thread when we need to print the output to node_helper.js
-    lock.lock();
-    condition.wait(lock);
-
-    DEBUG_FPRINTF("STDOUT Thread received signal from sensor threads.\n");
-    std::cout << SENSOR_OUTPUT[0] << ":" << SENSOR_OUTPUT[1] << std::endl;
-
-    lock.unlock();
-  }
+  std::cout << SENSOR_OUTPUT[LEFT] << ":" << SENSOR_OUTPUT[RIGHT] << std::endl;
 }
 
-void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
-
+void sensorDistance(Sensor &sensor) {
   std::array<float, NUM_SAMPLES> distance;
 
   long int start{0}, end{0}, elapsed{0};
@@ -64,8 +47,6 @@ void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
     start = (long int)time(NULL);
     end = (long int)time(NULL);
     elapsed = 0;
-
-    DEBUG_FPRINTF("Thread %d at top barrier\n", sensor.side());
 
     for (int i{0}; i < NUM_SAMPLES; i++) {
       digitalWrite(sensor.triggerPin(), HIGH);
@@ -94,13 +75,14 @@ void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
     // write the output value to the global array for each thread
     SENSOR_OUTPUT[sensor.side()] = curr_dist;
 
-    DEBUG_FPRINTF("Thread %d at bottom barrier\n", sensor.side());
-
-    barrier.wait();
+    threadBarrier.wait();
 
     if (std::fabs(curr_dist - prev_dist) > 20.0) {
-      // signal the STDOUT thread and reset the inactive counts for the threads
-      condition.notify_one();
+      if (sensor.side() == RIGHT) { // print the contents of the global array to stdout
+        service.post(boost::bind(&stdoutHandler));
+        service.run_one();
+      }
+
       INACT_CNT[sensor.side()] = 0;
       sensor.setDelay(0);
 
@@ -114,17 +96,12 @@ void sensorDistance(Sensor &sensor, boost::barrier &barrier) {
     }
 
     prev_dist = curr_dist;
-    barrier.wait();
+    threadBarrier.wait();
 
     // short circuit the if statement if the THRTL_SENSOR is set to false
     if (THRTL_SENSOR && (INACT_CNT[sensor.side()] > 0) && (INACT_CNT[sensor.side()] % 10 == 0)) {
       // add an eighth of a second if we haven't hit MAX_DELAY
-
-      if (sensor.delay() < MAX_DELAY) {
-        sensor.setDelay(sensor.delay() + 125);
-      } else {
-        sensor.setDelay(MAX_DELAY);
-      }
+      sensor.setDelay((sensor.delay() < MAX_DELAY) ? (sensor.delay() + 125) : (MAX_DELAY));
     }
 
     DEBUG_FPRINTF("Thread %d throttleDelay = %d\n", sensor.side(), sensor.delay());

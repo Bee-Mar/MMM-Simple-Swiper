@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     cout << "Sensor initialization details:" << endl;
     cout << "==============================" << endl;
 
-#pragma unroll
+#pragma unroll(2)
     for (int i{0}; i < 2; i++) {
       cout << "Side = " << (sensor[i].side() == LEFT ? "LEFT" : "RIGHT") << endl;
       cout << "Echo Pin = " << sensor[i].echoPin() << endl;
@@ -74,4 +74,3 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }
-

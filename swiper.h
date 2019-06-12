@@ -10,20 +10,18 @@
 #include <boost/thread.hpp>
 #include <boost/thread/barrier.hpp>
 #include <cmath>
-#include <condition_variable>
 #include <csignal>
 #include <ctime>
 #include <iostream>
 #include <sys/wait.h>
-#include <thread>
 #include <wiringPi.h>
 
-#define READ 0
-#define WRITE 1
-#define LEFT 0
-#define RIGHT 1
-#define NUM_SAMPLES 10
-#define HALF_NUM_SAMPLES (NUM_SAMPLES / 2)
+constexpr int READ = 0;
+constexpr int WRITE = 1;
+constexpr int LEFT = 0;
+constexpr int RIGHT = 1;
+constexpr int NUM_SAMPLES = 10;
+constexpr int HALF_NUM_SAMPLES = (NUM_SAMPLES / 2);
 
 #if defined(DEBUG)
 #include <fstream>
@@ -36,12 +34,9 @@
 
 void signalCatcher(int sig);
 
-inline bool substrExists(std::size_t size) { return size != std::string::npos; }
+inline bool substrExists(std::size_t size);
 
-inline void errorMsg(const std::string msg) {
-  std::cout << msg << std::endl;
-  exit(-1);
-}
+inline void errorMsg(const std::string msg);
 
 void stdoutHandler(void);
 

@@ -12,9 +12,18 @@ std::array<float, 2> SENSOR_OUTPUT = {-10000.0, -10000.0};
 
 bool THRTL_SENSOR{false};
 
-int THRTL_DELAY{0}; // haven't used yet
+int THRTL_DELAY{0};
 int SENSOR_DELAY{1250};
 int MAX_DELAY{4000};
+
+inline bool substrExists(std::size_t size) {
+  return size != std::string::npos;
+}
+
+inline void errorMsg(const std::string msg) {
+  std::cout << msg << std::endl;
+  exit(-1);
+}
 
 void signalCatcher(int sig) {
   // catch the signal and clean up
@@ -27,7 +36,7 @@ float average(std::array<float, NUM_SAMPLES> vals) {
   float sum{0};
 
   // only use the first half of the values to trim extreme outliers
-#pragma unroll
+#pragma unroll(HALF_NUM_SAMPLES)
   for (int i{0}; i < HALF_NUM_SAMPLES; i++) { sum += vals[i]; }
 
   return (sum / HALF_NUM_SAMPLES);

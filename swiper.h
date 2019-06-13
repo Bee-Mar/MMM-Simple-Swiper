@@ -1,6 +1,6 @@
-#ifndef SWIPER_H
-#define SWIPER_H
-#define _DEFAULT_SOURCE // that damn usleep macro requirement
+#ifndef MMM_SIMPLE_SWIPER_SWIPER_H
+#define MMM_SIMPLE_SWIPER_SWIPER_H
+#define _DEFAULT_SOURCE // usleep macro requirement
 
 // converting to CPP headers
 #include "Sensor.h"

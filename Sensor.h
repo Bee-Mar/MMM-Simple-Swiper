@@ -1,5 +1,5 @@
-#ifndef SENSOR_H
-#define SENSOR_H
+#ifndef MMM_SIMPLE_SWIPER_SENSOR_H
+#define MMM_SIMPLE_SWIPER_SENSOR_H
 
 class Sensor {
 private:

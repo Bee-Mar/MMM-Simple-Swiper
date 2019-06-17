@@ -11,7 +11,10 @@ int main(int argc, char *argv[]) {
   char *debugJSON(const_cast<char *>(debugArgs.c_str()));
 
 #else
-  if (argc < 2) { errorMsg("ERROR: No input arguments."); }
+  if (argc < 2) {
+    std::cout << "ERROR: No input arguments." << std::endl;
+    exit(-1);
+  }
 #endif
 
   // snatch those gnarly keyboard interrupts

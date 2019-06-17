@@ -36,8 +36,6 @@ void signalCatcher(int sig);
 
 inline bool substrExists(std::size_t size);
 
-inline void errorMsg(const std::string msg);
-
 void stdoutHandler(void);
 
 void sensorDistance(Sensor &sensor);

@@ -15,7 +15,7 @@ int SENSOR_DELAY{1250};
 int MAX_DELAY{4000};
 
 inline bool substrExists(std::size_t size) {
-  return size != std::string::npos;
+  return (size != std::string::npos);
 }
 
 inline void errorMsg(const std::string msg) {
@@ -110,13 +110,13 @@ void sensorDistance(Sensor &sensor) {
       sensor.setDelay((sensor.delay() < MAX_DELAY) ? (sensor.delay() + 125) : (MAX_DELAY));
     }
 
-    DEBUG_FPRINTF("Thread %d throttleDelay = %d\n", sensor.side(), sensor.delay());
-    DEBUG_FPRINTF("Thread %d INACT_CNT = %d\n", sensor.side(), INACT_CNT[sensor.side()]);
+    DEBUG_PRINT("Thread %d throttleDelay = %d\n", sensor.side(), sensor.delay());
+    DEBUG_PRINT("Thread %d INACT_CNT = %d\n", sensor.side(), INACT_CNT[sensor.side()]);
 
     // this may be removed entirely
     // if (THRTL_SENSOR && (INACT_CNT[sensor.side] > 0) && (INACT_CNT[sensor.side] % 125 == 0)) {
     //   // try resetting page to home page after a while in here, if they want
-    //   DEBUG_FPRINTF("Resetting to home page\n");
+    //   DEBUG_PRINT("Resetting to home page\n");
     // }
 
     usleep((SENSOR_DELAY + sensor.delay()) * 1000);

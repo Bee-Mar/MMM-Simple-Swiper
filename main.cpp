@@ -31,27 +31,18 @@ int main(int argc, char *argv[]) {
 #endif
   );
 
-  sensor[LEFT].setSide(LEFT);
-  sensor[LEFT].setDelay(0);
-
-  sensor[RIGHT].setSide(RIGHT);
-  sensor[RIGHT].setDelay(0);
-
 #ifdef DEBUG
-  {
-    using namespace std;
-
-    cout << "Sensor initialization details:" << endl;
-    cout << "==============================" << endl;
+  std::cout << "Sensor initialization details:" << std::endl;
+  std::cout << "==============================" << std::endl;
 
 #pragma unroll(2)
-    for (int i{0}; i < 2; i++) {
-      cout << "Side = " << (sensor[i].side() == LEFT ? "LEFT" : "RIGHT") << endl;
-      cout << "Echo Pin = " << sensor[i].echoPin() << endl;
-      cout << "Trigger Pin = " << sensor[i].triggerPin() << endl;
-      cout << "\n" << endl;
-    }
+  for (int i{0}; i < 2; i++) {
+    std::cout << "Side = " << (sensor[i].side() == LEFT ? "LEFT" : "RIGHT") << std::endl;
+    std::cout << "Echo Pin = " << sensor[i].echoPin() << std::endl;
+    std::cout << "Trigger Pin = " << sensor[i].triggerPin() << std::endl;
+    std::cout << "\n" << std::endl;
   }
+
 #endif
 
   // setting up the pins and stuff

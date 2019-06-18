@@ -10,8 +10,6 @@ boost::barrier threadBarrier(2);
 std::array<int, 2> INACT_CNT = {0, 0};
 std::array<float, 2> SENSOR_OUTPUT = {-10000.0, -10000.0};
 
-bool THRTL_SENSOR{false};
-
 int THRTL_DELAY{0};
 int SENSOR_DELAY{1250};
 int MAX_DELAY{4000};
@@ -42,7 +40,7 @@ float average(std::array<float, NUM_SAMPLES> vals) {
   return (sum / HALF_NUM_SAMPLES);
 }
 
-void stdoutHandler(void) {
+void stdoutHandler() {
   std::cout << SENSOR_OUTPUT[LEFT] << ":" << SENSOR_OUTPUT[RIGHT] << std::endl;
 }
 
@@ -107,8 +105,8 @@ void sensorDistance(Sensor &sensor) {
     prev_dist = curr_dist;
     threadBarrier.wait();
 
-    // short circuit the if statement if the THRTL_SENSOR is set to false
-    if (THRTL_SENSOR && (INACT_CNT[sensor.side()] > 0) && (INACT_CNT[sensor.side()] % 10 == 0)) {
+    // short circuit the if statement if the sensor throttle is set to false
+    if (sensor.throttle() && INACT_CNT[sensor.side()] > 0 && (INACT_CNT[sensor.side()] % 10 == 0)) {
       // add an eighth of a second if we haven't hit MAX_DELAY
       sensor.setDelay((sensor.delay() < MAX_DELAY) ? (sensor.delay() + 125) : (MAX_DELAY));
     }
@@ -130,6 +128,9 @@ void parseJSON(Sensor sensor[2], char *JSON) {
   std::string configType, configValue;
   const int len(strlen(JSON) + 1);
   int side{0};
+
+  sensor[LEFT].setSide(LEFT);
+  sensor[RIGHT].setSide(RIGHT);
 
   for (int i{0}; i < len; i++) {
     const char currChar(tolower(JSON[i]));
@@ -153,7 +154,7 @@ void parseJSON(Sensor sensor[2], char *JSON) {
         SENSOR_DELAY = std::stoi(configValue);
 
       } else if (substrExists(configType.find("throttleSensor"))) {
-        THRTL_SENSOR = substrExists(configType.find("true"));
+        sensor[side].setThrottleSensor(substrExists(configType.find("true")));
 
       } else if (substrExists(configType.find("maxDelay"))) {
         MAX_DELAY = std::stoi(configValue);

@@ -1,11 +1,12 @@
 #include "Sensor.h"
 
 // constructors
-Sensor::Sensor() {
+Sensor::Sensor() : sensorDelay(0) {
 }
 
-Sensor::Sensor(int trigger, int echo, int side, int delay)
-    : triggerPinNumber(trigger), echoPinNumber(echo), sensorSide(side), sensorDelay(delay) {
+Sensor::Sensor(int delay, int trigger, int echo, int side, bool throttle)
+    : sensorDelay(delay), triggerPinNumber(trigger), echoPinNumber(echo), sensorSide(side),
+      throttleSensor(throttle) {
 }
 
 // setters
@@ -25,6 +26,10 @@ void Sensor::setDelay(int delay) {
   sensorDelay = delay;
 }
 
+void Sensor::setThrottleSensor(bool throttle) {
+  throttleSensor = throttle;
+}
+
 // getters
 int Sensor::triggerPin() {
   return triggerPinNumber;
@@ -40,6 +45,10 @@ int Sensor::side() {
 
 int Sensor::delay() {
   return sensorDelay;
+}
+
+bool Sensor::throttle() {
+  return throttleSensor;
 }
 
 // destructor

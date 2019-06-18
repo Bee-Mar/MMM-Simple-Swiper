@@ -2,6 +2,9 @@
 
 int main(int argc, char *argv[]) {
 
+  using std::cout;
+  using std::endl;
+
 #ifdef DEBUG
   std::ifstream debugFile("debug_parameters.json");
 
@@ -12,7 +15,7 @@ int main(int argc, char *argv[]) {
 
 #else
   if (argc < 2) {
-    std::cout << "ERROR: No input arguments." << std::endl;
+    cout << "ERROR: No input arguments." << endl;
     exit(-1);
   }
 #endif
@@ -32,15 +35,14 @@ int main(int argc, char *argv[]) {
   );
 
 #ifdef DEBUG
-  std::cout << "Sensor initialization details:" << std::endl;
-  std::cout << "==============================" << std::endl;
+  cout << "Sensor initialization details:" << endl;
+  cout << "==============================" << endl;
 
-#pragma unroll(2)
   for (int i{0}; i < 2; i++) {
-    std::cout << "Side = " << (sensor[i].side() == LEFT ? "LEFT" : "RIGHT") << std::endl;
-    std::cout << "Echo Pin = " << sensor[i].echoPin() << std::endl;
-    std::cout << "Trigger Pin = " << sensor[i].triggerPin() << std::endl;
-    std::cout << "\n" << std::endl;
+    cout << "Side = " << (sensor[i].side() == LEFT ? "LEFT" : "RIGHT") << endl;
+    cout << "Echo Pin = " << sensor[i].echoPin() << endl;
+    cout << "Trigger Pin = " << sensor[i].triggerPin() << endl;
+    cout << "\n" << endl;
   }
 
 #endif
@@ -57,10 +59,13 @@ int main(int argc, char *argv[]) {
   digitalWrite(sensor[LEFT].triggerPin(), LOW);
   digitalWrite(sensor[RIGHT].triggerPin(), LOW);
 
-  std::array<boost::thread, 2> threads;
+  using boost::ref;
+  using boost::thread;
 
-  threads[0] = boost::thread(boost::bind(&sensorDistance, boost::ref(sensor[LEFT])));
-  threads[1] = boost::thread(boost::bind(sensorDistance, boost::ref(sensor[RIGHT])));
+  std::array<thread, 2> threads;
+
+  threads[0] = thread(bind(&sensorDistance, ref(sensor[LEFT])));
+  threads[1] = thread(bind(sensorDistance, ref(sensor[RIGHT])));
 
   // will never get to this point anyway
   threads[LEFT].join();

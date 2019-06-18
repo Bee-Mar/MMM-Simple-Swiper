@@ -34,7 +34,6 @@ float average(std::array<float, NUM_SAMPLES> vals) {
   float sum{0};
 
   // only use the first half of the values to trim extreme outliers
-#pragma unroll(HALF_NUM_SAMPLES)
   for (int i{0}; i < HALF_NUM_SAMPLES; i++) { sum += vals[i]; }
 
   return (sum / HALF_NUM_SAMPLES);

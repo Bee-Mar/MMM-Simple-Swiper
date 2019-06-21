@@ -62,10 +62,8 @@ int main(int argc, char *argv[]) {
   using boost::ref;
   using boost::thread;
 
-  std::array<thread, 2> threads;
-
-  threads[0] = thread(bind(&sensorDistance, ref(sensor[LEFT])));
-  threads[1] = thread(bind(sensorDistance, ref(sensor[RIGHT])));
+  std::array<thread, 2> threads{thread(bind(&sensorDistance, ref(sensor[LEFT]))),
+                                thread(bind(sensorDistance, ref(sensor[RIGHT])))};
 
   // will never get to this point anyway
   threads[LEFT].join();

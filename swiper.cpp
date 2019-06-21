@@ -7,8 +7,8 @@ boost::asio::io_service::work work(service);
 boost::barrier threadBarrier(2);
 
 // inactive count/tracker for each sensor, and the recorded distances for each sensor
-std::array<int, 2> INACT_CNT = {0, 0};
-std::array<float, 2> SENSOR_OUTPUT = {-10000.0, -10000.0};
+std::array<int, 2> INACT_CNT{0, 0};
+std::array<float, 2> SENSOR_OUTPUT{-10000.0, -10000.0};
 
 int THRTL_DELAY{0};
 int SENSOR_DELAY{1250};

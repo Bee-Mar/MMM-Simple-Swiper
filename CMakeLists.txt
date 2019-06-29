@@ -4,18 +4,18 @@ project(MMM-Simple-Swiper)
 
 if(NOT EXISTS "/usr/local/include/wiringPi.h")
   message("wiringPi dependency not met. Collecting and building wiringPi...\n")
-  execute_process(COMMAND git clone git://git.drogon.net/wiringPi)
-  execute_process(COMMAND cd wiringPi && ./build)
+  execute_process(COMMAND git clone git://git.drogon.net/wiringPi && cd wiringPi && ./build)
 endif()
 
-if(NOT EXISTS "../node_modules")
-  message("NodeJS dependencies don't appear to be installed. Running 'npm install' for you...")
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/node_modules")
+  message("-- node_modules directory not found project root: Running 'npm install'")
   execute_process(COMMAND npm install)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   # defines the macro used for debug mode within the executable
   add_definitions(-DMMM_SIMPLE_SWIPER_DEBUG)
+  message("-- Compiling with MMM_SIMPLE_SWIPER_DEBUG flag set")
   # can be turned on from terminal using the following command:
   # cmake -DCMAKE_BUILD_TYPE=Debug ..
 endif()
@@ -41,7 +41,7 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED
     COMPONENTS
     system  # boost::system
-    thread # boost::thread
+    thread  # boost::thread
   )
 
 find_package(Threads REQUIRED) # linking pthread
@@ -50,9 +50,9 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 add_executable(mmm_simple_swiper # executable
     # source code files
-    CXX/main.cpp
-    CXX/swiper.cpp
-    CXX/Sensor.cpp
+    ${PROJECT_SOURCE_DIR}/CXX/main.cpp
+    ${PROJECT_SOURCE_DIR}/CXX/swiper.cpp
+    ${PROJECT_SOURCE_DIR}/CXX/Sensor.cpp
   )
 
 target_link_libraries(mmm_simple_swiper # executable
@@ -62,3 +62,4 @@ target_link_libraries(mmm_simple_swiper # executable
     ${CMAKE_THREAD_LIBS_INIT}
     crypt
   )
+

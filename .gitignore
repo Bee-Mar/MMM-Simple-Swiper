@@ -5,5 +5,4 @@ node_modules
 wiringPi
 main
 package-lock.json
-.ccls
-.ccls-cache/
+build

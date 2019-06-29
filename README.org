@@ -94,7 +94,8 @@ git clone https://github.com/Bee-Mar/MMM-Simple-Swiper.git
 
 cd MMM-Simple-Swiper
 
-make -j4
+mkdir build && cd $_ && cmake .. && make -j$(nproc)
+
 #+END_SRC
 ** SuDON'T
 

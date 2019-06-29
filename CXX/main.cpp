@@ -5,8 +5,10 @@ int main(int argc, char *argv[]) {
   using std::cout;
   using std::endl;
 
-#ifdef DEBUG
-  std::ifstream debugFile("debug_parameters.json");
+#ifdef MMM_SIMPLE_SWIPER_DEBUG
+  // the executable will be placed in the 'build' directory, so the
+  // debug_parameters.json file will located one level down
+  std::ifstream debugFile("../debug_parameters.json");
 
   std::string debugArgs((std::istreambuf_iterator<char>(debugFile)),
                         (std::istreambuf_iterator<char>()));
@@ -27,14 +29,14 @@ int main(int argc, char *argv[]) {
 
   // read and parse the config passed over from MMM-simple-swiper.js, or debug_parameters.json
   parseJSON(sensor,
-#ifdef DEBUG
+#ifdef MMM_SIMPLE_SWIPER_DEBUG
             debugJSON
 #else
             argv[1]
 #endif
   );
 
-#ifdef DEBUG
+#ifdef MMM_SIMPLE_SWIPER_DEBUG
   cout << "Sensor initialization details:" << endl;
   cout << "==============================" << endl;
 

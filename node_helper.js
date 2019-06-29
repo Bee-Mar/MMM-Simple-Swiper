@@ -10,7 +10,7 @@ module.exports = NodeHelper.create({
 
     // creating demon spawn
     const child = require("child_process").spawn("sudo", [
-      path.join(__dirname, "/mmm_simple_swiper"),
+      path.join(__dirname, "/build/mmm_simple_swiper"),
       JSON.stringify(payload)
     ]);
 

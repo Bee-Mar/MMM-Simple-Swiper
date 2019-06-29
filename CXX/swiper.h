@@ -23,10 +23,10 @@ constexpr int RIGHT = 1;
 constexpr int NUM_SAMPLES = 10;
 constexpr int HALF_NUM_SAMPLES = (NUM_SAMPLES / 2);
 
-#if defined(DEBUG)
+#if defined(MMM_SIMPLE_SWIPER_DEBUG)
 #include <fstream>
 
-#define DEBUG_PRINT(fmt, args...)                                                                \
+#define DEBUG_PRINT(fmt, args...)                                                                  \
   fprintf(stderr, "DEBUG MODE: %s:%d:%s(): " fmt, __FILE__, __LINE__, __func__, ##args)
 #else
 #define DEBUG_PRINT(fmt, args...)

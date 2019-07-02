@@ -6,3 +6,4 @@ wiringPi
 main
 package-lock.json
 build
+.clangd

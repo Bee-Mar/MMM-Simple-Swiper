@@ -34,11 +34,11 @@ constexpr int HALF_NUM_SAMPLES = (NUM_SAMPLES / 2);
 
 auto signalCatcher(int sig) -> void;
 
-inline auto substrExists(std::size_t size) -> bool {
+auto inline substringExists(std::size_t size) -> bool {
   return (size != std::string::npos);
 }
 
-inline auto errorMsg(const std::string msg) -> void {
+auto inline errorMessage(const std::string msg) -> void {
   std::cout << msg << std::endl;
   exit(-1);
 }

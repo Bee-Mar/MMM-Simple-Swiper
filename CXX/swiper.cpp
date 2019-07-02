@@ -14,9 +14,7 @@ int THRTL_DELAY{0};
 int SENSOR_DELAY{1'250};
 int MAX_DELAY{4'000};
 
-// substrExists in header file
-
-// errorMsg in header file
+// inline functions in header file: substringExists & errorMessage
 
 auto signalCatcher(int sig) -> void {
   // catch the signal and clean up
@@ -42,11 +40,11 @@ auto sensorDistance(Sensor &sensor) -> void {
   std::array<float, NUM_SAMPLES> distance;
 
   long int start{0}, end{0}, elapsed{0};
+
   float prev_dist{-1'000.0}, curr_dist{0};
 
   while (true) {
-    start = (long int)time(NULL);
-    end = (long int)time(NULL);
+    start = end = static_cast<long int>(time(NULL));
     elapsed = 0;
 
     for (int i{0}; i < NUM_SAMPLES; i++) {
@@ -120,6 +118,7 @@ auto sensorDistance(Sensor &sensor) -> void {
 
 auto parseJSON(Sensor sensor[2], char *JSON) -> void {
   std::string configType, configValue;
+
   const int len(strlen(JSON) + 1);
   int side{0};
 
@@ -136,21 +135,21 @@ auto parseJSON(Sensor sensor[2], char *JSON) -> void {
       configValue.push_back(currChar);
 
     } else if (currChar == ',' || currChar == '}') {
-      side = (substrExists(configType.find("right")) ? RIGHT : LEFT);
+      side = (substringExists(configType.find("right")) ? RIGHT : LEFT);
 
-      if (substrExists(configType.find("trigger"))) {
+      if (substringExists(configType.find("trigger"))) {
         sensor[side].setTriggerPin(std::stoi(configValue));
 
-      } else if (substrExists(configType.find("echo"))) {
+      } else if (substringExists(configType.find("echo"))) {
         sensor[side].setEchoPin(std::stoi(configValue));
 
-      } else if (substrExists(configType.find("delay"))) {
+      } else if (substringExists(configType.find("delay"))) {
         SENSOR_DELAY = std::stoi(configValue);
 
-      } else if (substrExists(configType.find("throttleSensor"))) {
-        sensor[side].setThrottleSensor(substrExists(configType.find("true")));
+      } else if (substringExists(configType.find("throttleSensor"))) {
+        sensor[side].setThrottleSensor(substringExists(configType.find("true")));
 
-      } else if (substrExists(configType.find("maxDelay"))) {
+      } else if (substringExists(configType.find("maxDelay"))) {
         MAX_DELAY = std::stoi(configValue);
       }
 

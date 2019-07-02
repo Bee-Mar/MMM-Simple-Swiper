@@ -1,0 +1,17 @@
+[
+{
+  "directory": "/home/bpm/Development/github/MMM-Simple-Swiper/build",
+  "command": "/usr/bin/c++      -std=gnu++14 -o CMakeFiles/mmm_simple_swiper.dir/CXX/main.cpp.o -c /home/bpm/Development/github/MMM-Simple-Swiper/CXX/main.cpp",
+  "file": "/home/bpm/Development/github/MMM-Simple-Swiper/CXX/main.cpp"
+},
+{
+  "directory": "/home/bpm/Development/github/MMM-Simple-Swiper/build",
+  "command": "/usr/bin/c++      -std=gnu++14 -o CMakeFiles/mmm_simple_swiper.dir/CXX/swiper.cpp.o -c /home/bpm/Development/github/MMM-Simple-Swiper/CXX/swiper.cpp",
+  "file": "/home/bpm/Development/github/MMM-Simple-Swiper/CXX/swiper.cpp"
+},
+{
+  "directory": "/home/bpm/Development/github/MMM-Simple-Swiper/build",
+  "command": "/usr/bin/c++      -std=gnu++14 -o CMakeFiles/mmm_simple_swiper.dir/CXX/Sensor.cpp.o -c /home/bpm/Development/github/MMM-Simple-Swiper/CXX/Sensor.cpp",
+  "file": "/home/bpm/Development/github/MMM-Simple-Swiper/CXX/Sensor.cpp"
+}
+]

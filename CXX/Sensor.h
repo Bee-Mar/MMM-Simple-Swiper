@@ -4,33 +4,33 @@
 
 class Sensor {
 private:
-  int sensorDelay;
-  int triggerPinNumber;
-  int echoPinNumber;
-  int sensorSide; // left or right
+  int sensor_delay;
+  int trigger_pin_number;
+  int echo_pin_number;
+  int sensor_side; // left or right
   bool throttleSensor;
 
 public:
   // constructors
-  Sensor();
+  Sensor(void);
   Sensor(int trigger, int echo, int side, int delay, bool throttle);
 
   // setters
-  auto setTriggerPin(int trig) -> void;
-  auto setEchoPin(int echo) -> void;
-  auto setSide(int side) -> void;
-  auto setDelay(int delay) -> void;
-  auto setThrottleSensor(bool throttle) -> void;
+  auto set_trigger_pin(int trig) -> void;
+  auto set_echo_pin(int echo) -> void;
+  auto set_side(int side) -> void;
+  auto set_delay(int delay) -> void;
+  auto set_throttle_sensor(bool throttle) -> void;
 
   // getters
-  auto triggerPin() -> int;
-  auto echoPin() -> int;
-  auto side() -> int;
-  auto delay() -> int;
-  auto throttle() -> bool;
+  auto trigger_pin(void) -> int;
+  auto echo_pin(void) -> int;
+  auto side(void) -> int;
+  auto delay(void) -> int;
+  auto throttle(void) -> bool;
 
   // destructor
-  virtual ~Sensor();
+  virtual ~Sensor(void);
 };
 
 #endif

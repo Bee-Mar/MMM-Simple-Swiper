@@ -32,7 +32,7 @@ constexpr int HALF_NUM_SAMPLES = (NUM_SAMPLES / 2);
 #define DEBUG_PRINT(fmt, args...)
 #endif
 
-auto signalCatcher(int sig) -> void;
+auto signal_catcher(int sig) -> void;
 
 auto inline substringExists(std::size_t size) -> bool {
   return (size != std::string::npos);
@@ -43,12 +43,12 @@ auto inline errorMessage(const std::string msg) -> void {
   exit(-1);
 }
 
-auto stdoutHandler() -> void;
+auto stdout_handler() -> void;
 
-auto sensorDistance(Sensor &sensor) -> void;
+auto calculate_sensor_distance(Sensor &sensor) -> void;
 
 auto average(float vals[NUM_SAMPLES]) -> float;
 
-auto parseJSON(Sensor sensor[2], char *JSON) -> void;
+auto parse_JSON(Sensor sensor[2], char *JSON) -> void;
 
 #endif

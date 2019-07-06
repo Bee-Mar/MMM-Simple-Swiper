@@ -7,4 +7,3 @@ main
 package-lock.json
 build
 .clangd
-.ccls-cache

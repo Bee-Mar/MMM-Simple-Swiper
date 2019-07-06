@@ -1,56 +1,56 @@
 #include "Sensor.h"
 
 // constructors
-Sensor::Sensor() : sensorDelay(0) {
+Sensor::Sensor(void) : sensor_delay(0) {
 }
 
 Sensor::Sensor(int delay, int trigger, int echo, int side, bool throttle)
-    : sensorDelay(delay), triggerPinNumber(trigger), echoPinNumber(echo), sensorSide(side),
+    : sensor_delay(delay), trigger_pin_number(trigger), echo_pin_number(echo), sensor_side(side),
       throttleSensor(throttle) {
 }
 
 // setters
-auto Sensor::setTriggerPin(int trigger) -> void {
-  triggerPinNumber = trigger;
+auto Sensor::set_trigger_pin(int trigger) -> void {
+  trigger_pin_number = trigger;
 }
 
-auto Sensor::setEchoPin(int echo) -> void {
-  echoPinNumber = echo;
+auto Sensor::set_echo_pin(int echo) -> void {
+  echo_pin_number = echo;
 }
 
-auto Sensor::setSide(int side) -> void {
-  sensorSide = side;
+auto Sensor::set_side(int side) -> void {
+  sensor_side = side;
 }
 
-auto Sensor::setDelay(int delay) -> void {
-  sensorDelay = delay;
+auto Sensor::set_delay(int delay) -> void {
+  sensor_delay = delay;
 }
 
-auto Sensor::setThrottleSensor(bool throttle) -> void {
+auto Sensor::set_throttle_sensor(bool throttle) -> void {
   throttleSensor = throttle;
 }
 
 // getters
-auto Sensor::triggerPin() -> int {
-  return triggerPinNumber;
+auto Sensor::trigger_pin(void) -> int {
+  return trigger_pin_number;
 }
 
-auto Sensor::echoPin() -> int {
-  return echoPinNumber;
+auto Sensor::echo_pin(void) -> int {
+  return echo_pin_number;
 }
 
-auto Sensor::side() -> int {
-  return sensorSide;
+auto Sensor::side(void) -> int {
+  return sensor_side;
 }
 
-auto Sensor::delay() -> int {
-  return sensorDelay;
+auto Sensor::delay(void) -> int {
+  return sensor_delay;
 }
 
-auto Sensor::throttle() -> bool {
+auto Sensor::throttle(void) -> bool {
   return throttleSensor;
 }
 
 // destructor
-Sensor::~Sensor() {
+Sensor::~Sensor(void) {
 }

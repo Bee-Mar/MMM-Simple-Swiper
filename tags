@@ -1,0 +1,33 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+DEBUG_PRINT	CXX/swiper.h	29;"	d
+DEBUG_PRINT	CXX/swiper.h	32;"	d
+HALF_NUM_SAMPLES	CXX/swiper.h	/^constexpr int HALF_NUM_SAMPLES = (NUM_SAMPLES \/ 2);$/;"	v
+LEFT	CXX/swiper.h	/^constexpr int LEFT = 0;$/;"	v
+MMM_SIMPLE_SWIPER_SENSOR_H	CXX/Sensor.h	2;"	d
+MMM_SIMPLE_SWIPER_SWIPER_H	CXX/swiper.h	2;"	d
+NUM_SAMPLES	CXX/swiper.h	/^constexpr int NUM_SAMPLES = 10;$/;"	v
+READ	CXX/swiper.h	/^constexpr int READ = 0;$/;"	v
+RIGHT	CXX/swiper.h	/^constexpr int RIGHT = 1;$/;"	v
+Sensor	CXX/Sensor.cpp	/^Sensor::Sensor(int delay, int trigger, int echo, int side, bool throttle)$/;"	f	class:Sensor
+Sensor	CXX/Sensor.cpp	/^Sensor::Sensor(void) : sensor_delay(0) {$/;"	f	class:Sensor
+Sensor	CXX/Sensor.h	/^class Sensor {$/;"	c
+WRITE	CXX/swiper.h	/^constexpr int WRITE = 1;$/;"	v
+_DEFAULT_SOURCE	CXX/swiper.h	3;"	d
+address	extra/sample-config-file/SAMPLE_CONFIG.js	/^var config = {$/;"	p	class:config
+auto	CXX/Sensor.h	3;"	d
+bool	CXX/Sensor.h	/^  auto throttle(void) -> bool;$/;"	m	class:Sensor
+echo_pin_number	CXX/Sensor.h	/^  int echo_pin_number;$/;"	m	class:Sensor
+ipWhitelist	extra/sample-config-file/SAMPLE_CONFIG.js	/^  port: 8080,$/;"	p	class:config
+main	CXX/main.cpp	/^int main(int argc, char *argv[]) {$/;"	f
+port	extra/sample-config-file/SAMPLE_CONFIG.js	/^  address: "localhost", \/\/ Address to listen on, can be:$/;"	p	class:config
+sensor_delay	CXX/Sensor.h	/^  int sensor_delay;$/;"	m	class:Sensor
+sensor_side	CXX/Sensor.h	/^  int sensor_side; \/\/ left or right$/;"	m	class:Sensor
+service	CXX/swiper.cpp	/^boost::asio::io_service service;$/;"	v
+throttleSensor	CXX/Sensor.h	/^  bool throttleSensor;$/;"	m	class:Sensor
+trigger_pin_number	CXX/Sensor.h	/^  int trigger_pin_number;$/;"	m	class:Sensor
+~Sensor	CXX/Sensor.cpp	/^Sensor::~Sensor(void) {$/;"	f	class:Sensor

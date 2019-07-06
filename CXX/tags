@@ -1,18 +1,15 @@
-auto	Sensor.h	3
-bool	Sensor.h	30
-echo_pin_number	Sensor.h	9
-int	Sensor.h	26
-int	Sensor.h	27
-int	Sensor.h	28
-int	Sensor.h	29
-MMM_SIMPLE_SWIPER_SENSOR_H	Sensor.h	2
-sensor_delay	Sensor.h	7
-Sensor	Sensor.h	5
-sensor_side	Sensor.h	10
-throttleSensor	Sensor.h	11
-trigger_pin_number	Sensor.h	8
-void	Sensor.h	19
-void	Sensor.h	20
-void	Sensor.h	21
-void	Sensor.h	22
-void	Sensor.h	23
+DEBUG_PRINT	swiper.h	29;"	d
+DEBUG_PRINT	swiper.h	32;"	d
+HALF_NUM_SAMPLES	swiper.h	/^constexpr int HALF_NUM_SAMPLES = (NUM_SAMPLES \/ 2);$/;"	v
+LEFT	swiper.h	/^constexpr int LEFT = 0;$/;"	v
+MMM_SIMPLE_SWIPER_SWIPER_H	swiper.h	2;"	d
+NUM_SAMPLES	swiper.h	/^constexpr int NUM_SAMPLES = 10;$/;"	v
+READ	swiper.h	/^constexpr int READ = 0;$/;"	v
+RIGHT	swiper.h	/^constexpr int RIGHT = 1;$/;"	v
+Sensor	Sensor.cpp	/^Sensor::Sensor(int delay, int trigger, int echo, int side, bool throttle)$/;"	f	class:Sensor
+Sensor	Sensor.cpp	/^Sensor::Sensor(void) : sensor_delay(0) {$/;"	f	class:Sensor
+WRITE	swiper.h	/^constexpr int WRITE = 1;$/;"	v
+_DEFAULT_SOURCE	swiper.h	3;"	d
+main	main.cpp	/^int main(int argc, char *argv[]) {$/;"	f
+service	swiper.cpp	/^boost::asio::io_service service;$/;"	v
+~Sensor	Sensor.cpp	/^Sensor::~Sensor(void) {$/;"	f	class:Sensor

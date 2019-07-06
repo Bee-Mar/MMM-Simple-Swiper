@@ -11,44 +11,44 @@ Sensor::Sensor(int delay, int trigger, int echo, int side, bool throttle)
 
 // setters
 auto Sensor::set_trigger_pin(int trigger) -> void {
-  trigger_pin_number = trigger;
+    trigger_pin_number = trigger;
 }
 
 auto Sensor::set_echo_pin(int echo) -> void {
-  echo_pin_number = echo;
+    echo_pin_number = echo;
 }
 
 auto Sensor::set_side(int side) -> void {
-  sensor_side = side;
+    sensor_side = side;
 }
 
 auto Sensor::set_delay(int delay) -> void {
-  sensor_delay = delay;
+    sensor_delay = delay;
 }
 
 auto Sensor::set_throttle_sensor(bool throttle) -> void {
-  throttleSensor = throttle;
+    throttleSensor = throttle;
 }
 
 // getters
 auto Sensor::trigger_pin(void) -> int {
-  return trigger_pin_number;
+    return trigger_pin_number;
 }
 
 auto Sensor::echo_pin(void) -> int {
-  return echo_pin_number;
+    return echo_pin_number;
 }
 
 auto Sensor::side(void) -> int {
-  return sensor_side;
+    return sensor_side;
 }
 
 auto Sensor::delay(void) -> int {
-  return sensor_delay;
+    return sensor_delay;
 }
 
 auto Sensor::throttle(void) -> bool {
-  return throttleSensor;
+    return throttleSensor;
 }
 
 // destructor

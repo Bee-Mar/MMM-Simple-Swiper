@@ -1,16 +1,15 @@
-const NodeHelper = require("node_helper");
-const path = require("path");
+import { create } from "node_helper";
+import { join } from "path";
 
-module.exports = NodeHelper.create({
+export default create({
   socketNotificationReceived: (notification, payload) => {
     const threshold = payload["threshold"];
     const distDiff = payload["distanceDiff"];
-
-    const DEBUG = payload["debug"];
+    const debug_mode = payload["debug"];
 
     // creating demon spawn
     const child = require("child_process").spawn("sudo", [
-      path.join(__dirname, "/build/mmm_simple_swiper"),
+      join(__dirname, "/build/mmm_simple_swiper"),
       JSON.stringify(payload)
     ]);
 
@@ -25,10 +24,11 @@ module.exports = NodeHelper.create({
       const leftDist = parseFloat(data[0]).toFixed(0);
       const rightDist = parseFloat(data[1]).toFixed(0);
 
-      if (DEBUG) {
+      if (debug_mode) {
         console.log("LEFT: " + leftDist + ", RIGHT: " + rightDist);
       }
 
+      // first check if the values are within the threshold distance
       if (leftDist <= threshold && rightDist <= threshold) {
         if (leftDist * distDiff <= rightDist) {
           this.sendSocketNotification("PAGE_INCREMENT", null);

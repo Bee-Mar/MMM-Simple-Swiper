@@ -27,7 +27,7 @@ constexpr int HALF_NUM_SAMPLES = (NUM_SAMPLES / 2);
 #include <fstream>
 
 #define DEBUG_PRINT(fmt, args...)                                                                  \
-  fprintf(stderr, "DEBUG MODE: %s:%d:%s(): " fmt, __FILE__, __LINE__, __func__, ##args)
+    fprintf(stderr, "DEBUG MODE: %s:%d:%s(): " fmt, __FILE__, __LINE__, __func__, ##args)
 #else
 #define DEBUG_PRINT(fmt, args...)
 #endif
@@ -35,12 +35,12 @@ constexpr int HALF_NUM_SAMPLES = (NUM_SAMPLES / 2);
 auto signal_catcher(int sig) -> void;
 
 auto inline substringExists(std::size_t size) -> bool {
-  return (size != std::string::npos);
+    return (size != std::string::npos);
 }
 
 auto inline errorMessage(const std::string msg) -> void {
-  std::cout << msg << std::endl;
-  exit(-1);
+    std::cout << msg << std::endl;
+    exit(-1);
 }
 
 auto stdout_handler() -> void;

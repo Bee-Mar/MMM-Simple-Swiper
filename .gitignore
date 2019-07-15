@@ -1,6 +1,7 @@
 node_modules
 .tern-project
 .tern-port
+.clang-format
 wiringPi
 package-lock.json
 build

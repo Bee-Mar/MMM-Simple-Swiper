@@ -32,27 +32,27 @@ var config = {
         modules: [
           [
             "weatherforecast", // feel free to remove or swap out
-            "newsfeed", // feel free to remove or swap out
+            "newsfeed" // feel free to remove or swap out
           ],
           [
             "calendar", // feel free to remove or swap out
-            "compliments", // feel free to remove or swap out
-          ],
+            "compliments" // feel free to remove or swap out
+          ]
         ],
         excludes: [
           "clock", // feel free to remove or swap out
           "currentweather", // feel free to remove or swap out
           "MMM-page-indicator", // REQUIRED
-          "MMM-Simple-Swiper", // REQUIRED
-        ],
-      },
+          "MMM-Simple-Swiper" // REQUIRED
+        ]
+      }
     },
     {
       module: "MMM-page-indicator", //REQUIRED
       position: "bottom_bar", // feel free to adjust
       config: {
-        pages: 3, // feel free to adjust
-      },
+        pages: 3 // feel free to adjust
+      }
     },
     {
       module: "MMM-Simple-Swiper",
@@ -65,24 +65,24 @@ var config = {
         threshold: 175, // in centimeters
         distanceDiff: 1.25, // difference between both sensors
         debug: false, // if true, the raw data is printed to stdout while MagicMirror is running
-        delay: 1000, // time between passing data from C executable to the node_helper in milliseconds
-      },
+        delay: 1000 // time between passing data from C executable to the node_helper in milliseconds
+      }
     },
     {
       module: "alert", // feel free to remove or swap out
-      disabled: false,
+      disabled: false
     },
     {
       module: "updatenotification", // feel free to remove or swap out
       position: "top_bar",
-      disabled: false,
+      disabled: false
     },
     {
       module: "clock", // feel free to remove or swap out
       position: "top_right",
       timeFormat: 12,
       showPeriodUpper: true,
-      disabled: false,
+      disabled: false
     },
     {
       module: "calendar", // feel free to remove or swap out
@@ -93,16 +93,16 @@ var config = {
         calendars: [
           {
             symbol: "calendar-check-o ",
-            url: "webcal://www.calendarlabs.com/templates/ical/US-Holidays.ics",
-          },
-        ],
-      },
+            url: "webcal://www.calendarlabs.com/templates/ical/US-Holidays.ics"
+          }
+        ]
+      }
     },
 
     {
       module: "compliments", // feel free to remove or swap out
       position: "lower_third",
-      disabled: true,
+      disabled: true
     },
 
     {
@@ -113,8 +113,8 @@ var config = {
       config: {
         location: "New York, NY, USA",
         units: "imperial",
-        appid: "c0520f8e8537b2c7555a9f7d5c2d53ec",
-      },
+        appid: "c0520f8e8537b2c7555a9f7d5c2d53ec"
+      }
     },
 
     {
@@ -124,8 +124,8 @@ var config = {
       config: {
         location: "New York, NY, USA",
         units: "imperial",
-        appid: "c0520f8e8537b2c7555a9f7d5c2d53ec",
-      },
+        appid: "c0520f8e8537b2c7555a9f7d5c2d53ec"
+      }
     },
 
     {
@@ -135,22 +135,22 @@ var config = {
         feeds: [
           {
             title: "New York Times",
-            url: "http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+            url: "http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml"
           },
           {
             title: "CNET",
-            url: "https://www.cnet.com/rss/news/",
+            url: "https://www.cnet.com/rss/news/"
           },
           {
             title: "TechRepublic",
-            url: "https://www.techrepublic.com/rssfeeds/articles/",
-          },
+            url: "https://www.techrepublic.com/rssfeeds/articles/"
+          }
         ],
         showSourceTitle: true,
-        showPublishDate: true,
-      },
-    },
-  ],
+        showPublishDate: true
+      }
+    }
+  ]
 };
 
 /*************** DO NOT EDIT THE LINE BELOW ***************/

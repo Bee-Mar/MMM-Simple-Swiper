@@ -26,7 +26,7 @@ constexpr int HALF_NUM_SAMPLES = (NUM_SAMPLES / 2);
 #if defined(MMM_SIMPLE_SWIPER_DEBUG)
 #include <fstream>
 
-#define DEBUG_PRINT(fmt, args...)                                                                  \
+#define DEBUG_PRINT(fmt, args...)                                                                       \
     fprintf(stderr, "DEBUG MODE: %s:%d:%s(): " fmt, __FILE__, __LINE__, __func__, ##args)
 #else
 #define DEBUG_PRINT(fmt, args...)
@@ -34,12 +34,12 @@ constexpr int HALF_NUM_SAMPLES = (NUM_SAMPLES / 2);
 
 auto signal_catcher(int sig) -> void;
 
-auto inline substringExists(std::size_t size) -> bool {
+auto inline substring_exists(std::size_t size) -> bool {
     return (size != std::string::npos);
 }
 
-auto inline errorMessage(const std::string msg) -> void {
-    std::cout << msg << std::endl;
+auto inline error_message(const std::string msg) -> void {
+    std::cerr << "ERROR: " << msg << std::endl;
     exit(-1);
 }
 

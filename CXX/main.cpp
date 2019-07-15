@@ -16,14 +16,11 @@ int main(int argc, char *argv[]) {
     char *debug_JSON(const_cast<char *>(debug_args.c_str()));
 
 #else
-    if (argc < 2) {
-        cout << "ERROR: No input arguments." << endl;
-        exit(-1);
-    }
+    if (argc < 2) { error_message("No input arguments.") }
 #endif
 
     // snatch those gnarly keyboard interrupts
-    signal(SIGINT, signal_catcher);
+    std::signal(SIGINT, signal_catcher);
 
     Sensor sensor[2];
 
@@ -43,8 +40,7 @@ int main(int argc, char *argv[]) {
     for (int i{0}; i < 2; i++) {
         cout << "Side = " << (sensor[i].side() == LEFT ? "LEFT" : "RIGHT") << endl;
         cout << "Echo Pin = " << sensor[i].echo_pin() << endl;
-        cout << "Trigger Pin = " << sensor[i].trigger_pin() << endl;
-        cout << "\n" << endl;
+        cout << "Trigger Pin = " << sensor[i].trigger_pin() << "\n" << endl;
     }
 
 #endif

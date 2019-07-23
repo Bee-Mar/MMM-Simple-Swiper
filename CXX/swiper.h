@@ -16,12 +16,11 @@
 #include <sys/wait.h>
 #include <wiringPi.h>
 
-constexpr int READ = 0;
-constexpr int WRITE = 1;
-constexpr int LEFT = 0;
-constexpr int RIGHT = 1;
-constexpr int NUM_SAMPLES = 10;
-constexpr int HALF_NUM_SAMPLES = (NUM_SAMPLES / 2);
+constexpr int LEFT{0};
+constexpr int RIGHT{1};
+
+constexpr int NUM_SAMPLES{10};
+constexpr int HALF_NUM_SAMPLES{NUM_SAMPLES / 2};
 
 #if defined(MMM_SIMPLE_SWIPER_DEBUG)
 #include <fstream>

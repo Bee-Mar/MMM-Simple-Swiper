@@ -2,24 +2,21 @@
 
 int main(int argc, char *argv[]) {
 
-    using std::cout;
-    using std::endl;
-
 #ifdef MMM_SIMPLE_SWIPER_DEBUG
+
     // the executable will be placed in the 'build' directory, so the
     // debug_parameters.json file will located one level down
     std::ifstream debug_file("../debug_parameters.json");
 
-    std::string debug_args((std::istreambuf_iterator<char>(debug_file)),
-                           (std::istreambuf_iterator<char>()));
+    std::string debug_args(std::istreambuf_iterator<char>(debug_file), std::istreambuf_iterator<char>());
 
     char *debug_JSON(const_cast<char *>(debug_args.c_str()));
 
 #else
-    if (argc < 2) { error_message("No input arguments.") }
+    if (argc < 2) { error_message("No input arguments."); }
 #endif
 
-    // snatch those gnarly keyboard interrupts
+    // catch keyboard interrupts
     std::signal(SIGINT, signal_catcher);
 
     Sensor sensor[2];
@@ -34,6 +31,9 @@ int main(int argc, char *argv[]) {
     );
 
 #ifdef MMM_SIMPLE_SWIPER_DEBUG
+    using std::cout;
+    using std::endl;
+
     cout << "Sensor initialization details:" << endl;
     cout << "==============================" << endl;
 
@@ -57,9 +57,12 @@ int main(int argc, char *argv[]) {
     digitalWrite(sensor[LEFT].trigger_pin(), LOW);
     digitalWrite(sensor[RIGHT].trigger_pin(), LOW);
 
-    std::array<boost::thread, 2> threads{
-        boost::thread(boost::bind(&calculate_sensor_distance, boost::ref(sensor[LEFT]))),
-        boost::thread(boost::bind(&calculate_sensor_distance, boost::ref(sensor[RIGHT])))};
+    using boost::bind;
+    using boost::ref;
+    using boost::thread;
+
+    std::array<thread, 2> threads{thread(bind(&calculate_sensor_distance, ref(sensor[LEFT]))),
+                                  thread(bind(&calculate_sensor_distance, ref(sensor[RIGHT])))};
 
     // will never get to this point anyway
     threads[LEFT].join();

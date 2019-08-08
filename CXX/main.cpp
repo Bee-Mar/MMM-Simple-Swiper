@@ -8,7 +8,8 @@ int main(int argc, char *argv[]) {
     // debug_parameters.json file will located one level down
     std::ifstream debug_file("../debug_parameters.json");
 
-    std::string debug_args(std::istreambuf_iterator<char>(debug_file), std::istreambuf_iterator<char>());
+    std::istreambuf_iterator<char> stream_itr;
+    std::string debug_args(std::istreambuf_iterator<char>(debug_file), stream_itr);
 
     char *debug_JSON(const_cast<char *>(debug_args.c_str()));
 
@@ -37,7 +38,7 @@ int main(int argc, char *argv[]) {
     cout << "Sensor initialization details:" << endl;
     cout << "==============================" << endl;
 
-    for (int i{0}; i < 2; i++) {
+    for (int i { 0 }; i < 2; i++) {
         cout << "Side = " << (sensor[i].side() == LEFT ? "LEFT" : "RIGHT") << endl;
         cout << "Echo Pin = " << sensor[i].echo_pin() << endl;
         cout << "Trigger Pin = " << sensor[i].trigger_pin() << "\n" << endl;
@@ -61,8 +62,8 @@ int main(int argc, char *argv[]) {
     using boost::ref;
     using boost::thread;
 
-    std::array<thread, 2> threads{thread(bind(&calculate_sensor_distance, ref(sensor[LEFT]))),
-                                  thread(bind(&calculate_sensor_distance, ref(sensor[RIGHT])))};
+    std::array<thread, 2> threads { thread(bind(&calculate_sensor_distance, ref(sensor[LEFT]))),
+                                    thread(bind(&calculate_sensor_distance, ref(sensor[RIGHT]))) };
 
     // will never get to this point anyway
     threads[LEFT].join();

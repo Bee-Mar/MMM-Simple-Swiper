@@ -8,12 +8,12 @@ boost::asio::io_service service;
 boost::asio::io_service::work work(service);
 
 // inactive count/tracker for each sensor, and the recorded distances for each sensor
-std::array<int, 2> INACT_CNT{0, 0};
-std::array<float, 2> SENSOR_OUTPUT{-10'000.0, -10'000.0};
+std::array<int, 2> INACT_CNT { 0, 0 };
+std::array<float, 2> SENSOR_OUTPUT { -10'000.0, -10'000.0 };
 
-int THRTL_DELAY{0};
-int MAX_DELAY{4'000};
-int STANDARD_SENSOR_DELAY{1'250};
+int THRTL_DELAY { 0 };
+int MAX_DELAY { 4'000 };
+int STANDARD_SENSOR_DELAY { 1'250 };
 
 // inline functions in header file: substring_exists & errorMessage
 
@@ -25,10 +25,10 @@ auto signal_catcher(int sig) -> void {
 }
 
 auto average(std::array<float, NUM_SAMPLES> vals) -> float {
-    float sum{0};
+    float sum { 0 };
 
     // only use the first half of the values to trim extreme outliers
-    for (int i{0}; i < HALF_NUM_SAMPLES; i++) { sum += vals[i]; }
+    for (int i { 0 }; i < HALF_NUM_SAMPLES; i++) { sum += vals[i]; }
 
     return (sum / HALF_NUM_SAMPLES);
 }
@@ -40,15 +40,15 @@ auto stdout_handler() -> void {
 auto calculate_sensor_distance(Sensor &sensor) -> void {
     std::array<float, NUM_SAMPLES> distance;
 
-    long int start{0}, end{0}, elapsed{0};
-    float previous_distance{-1'000.0}, current_distance{0};
+    long int start { 0 }, end { 0 }, elapsed { 0 };
+    float previous_distance { -1'000.0 }, current_distance { 0 };
 
     while (true) {
         start = end = static_cast<long int>(time(NULL));
 
         elapsed = 0;
 
-        for (int i{0}; i < NUM_SAMPLES; i++) {
+        for (int i { 0 }; i < NUM_SAMPLES; i++) {
             digitalWrite(sensor.trigger_pin(), HIGH);
 
             delayMicroseconds(100);
@@ -100,7 +100,7 @@ auto calculate_sensor_distance(Sensor &sensor) -> void {
         previous_distance = current_distance;
         thread_barrier.wait();
 
-        const int inactive_count{INACT_CNT[sensor.side()]};
+        const int inactive_count { INACT_CNT[sensor.side()] };
 
         // short circuit the if statement if the sensor throttle is set to false
         if (sensor.throttle() && inactive_count > 0) {
@@ -123,14 +123,14 @@ auto calculate_sensor_distance(Sensor &sensor) -> void {
 
 auto parse_JSON(Sensor sensor[2], char *JSON) -> void {
 
-    const int JSON_length{static_cast<int>(strlen(JSON)) + 1};
+    const int JSON_length { static_cast<int>(strlen(JSON)) + 1 };
     std::string config_type, config_value;
-    int side{0};
+    int side { 0 };
 
     sensor[LEFT].set_side(LEFT);
     sensor[RIGHT].set_side(RIGHT);
 
-    for (int i{0}; i < JSON_length; i++) {
+    for (int i { 0 }; i < JSON_length; i++) {
         const char current_char(tolower(JSON[i]));
 
         if (std::isalpha(current_char)) {

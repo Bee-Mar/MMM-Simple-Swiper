@@ -65,6 +65,7 @@ You can either follow the manual instructions for installation below, or you can
 
 $ sudo apt-get install wiringpi -y
 $ mmpm -i MMM-Simple-Swiper
+$ cd ~/MagicMirror/modules/MMM-Simple-Swiper && make
 
 #+END_SRC
 
@@ -75,6 +76,7 @@ $ mmpm -i MMM-Simple-Swiper
    $ cd MMM-Simple-Swiper
    $ sudo apt-get install wiringpi -y
    $ npm install
+   $ make
 #+END_SRC
 
 Be sure to add the snippet for your =config.js= file below.

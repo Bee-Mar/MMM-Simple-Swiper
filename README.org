@@ -44,25 +44,22 @@
 
 ** Dependencies
    This module has three dependencies, all of which are listed in the
-   table below. Now, you could go ahead and clone the repos, and install
-   the libraries yourself, OOORRR you could be lazy and just let the
-   Makefile in this module take care of that for you. When you clone this
-   repo, and run =make build_depends=, the =wiringPi= libary will be
-   retrieved, built, and installed for you (aren't we nice?!). Just as a
-   warning, the build process (as noted by the creator of =wiringPi=)
-   does use =sudo= permissions without prompting you. Also, the two
-   NodeJS libraries will be automagically installed by the
-   =Makefile=...again, you are soooo welcome.
+   table below. When you clone this repo, install the =wiringPi= library using the instructions from the table below, and run and =npm install= inside repo's directory.
 
-   (I certainly hope you're picking up on our sarcastic demeanors by this
-   point.)
-
-   | Library Dependencies | Link                                         |
+   | Library Dependencies | Link/Installation                            |
    |----------------------+----------------------------------------------|
-   | WiringPi             | https://git.drogon.net/                      |
+   | WiringPi             | =sudo apt-get install wiringpi -y=           |
    | child_process        | https://nodejs.org/api/child_process.html    |
    | electron-rebuild     | https://github.com/electron/electron-rebuild |
-
+   
+   #+BEGIN_SRC sh
+   # full installation:
+   
+   https://github.com/Bee-Mar/MMM-Simple-Swiper.git
+   cd MMM-Simple-Swiper
+   sudo apt-get install wiringpi -y
+   npm install
+   #+END_SRC
 
    | Recommended MagicMirror Modules | Link                                              |
    |---------------------------------+---------------------------------------------------|

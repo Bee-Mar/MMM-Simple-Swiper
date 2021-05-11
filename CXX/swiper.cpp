@@ -56,12 +56,16 @@ auto calculate_sensor_distance(Sensor &sensor) -> void {
             digitalWrite(sensor.trigger_pin(), LOW);
 
             // do nothing until the read changes
-            while (digitalRead(sensor.echo_pin()) == LOW) {}
+            while (digitalRead(sensor.echo_pin()) == LOW) {
+                usleep(2500);
+            }
 
             start = micros();
 
             // do nothing until the read changes
-            while (digitalRead(sensor.echo_pin()) == HIGH) {}
+            while (digitalRead(sensor.echo_pin()) == HIGH) {
+                usleep(2500);
+            }
 
             end = micros();
 

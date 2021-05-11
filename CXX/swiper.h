@@ -15,6 +15,7 @@
 #include <iostream>
 #include <sys/wait.h>
 #include <wiringPi.h>
+#include <unistd.h>
 
 constexpr int LEFT{0};
 constexpr int RIGHT{1};

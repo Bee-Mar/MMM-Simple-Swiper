@@ -25,8 +25,7 @@ var config = {
   timeFormat: 24,
   units: "metric",
 
-  modules: [
-    {
+  modules: [{
       module: "MMM-pages", // REQUIRED
       config: {
         modules: [
@@ -65,7 +64,8 @@ var config = {
         threshold: 175, // in centimeters
         distanceDiff: 1.25, // difference between both sensors
         debug: false, // if true, the raw data is printed to stdout while MagicMirror is running
-        delay: 1000, // time between passing data from C executable to the node_helper in milliseconds
+        magicMirrorDelay: 1000, // number of milliseconds between passing data from C executable to the node_helper for MagicMirror to act upon
+        sensorDelay: 10, // the number of microseconds each sensor waits to check for changes in voltage (fine tune this for CPU performance)
       },
     },
     {
@@ -90,12 +90,10 @@ var config = {
       position: "top_right",
       disabled: false,
       config: {
-        calendars: [
-          {
-            symbol: "calendar-check-o ",
-            url: "webcal://www.calendarlabs.com/templates/ical/US-Holidays.ics",
-          },
-        ],
+        calendars: [{
+          symbol: "calendar-check-o ",
+          url: "webcal://www.calendarlabs.com/templates/ical/US-Holidays.ics",
+        }, ],
       },
     },
 
@@ -132,8 +130,7 @@ var config = {
       module: "newsfeed", // feel free to remove or swap out
       position: "bottom_bar",
       config: {
-        feeds: [
-          {
+        feeds: [{
             title: "New York Times",
             url: "http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml",
           },

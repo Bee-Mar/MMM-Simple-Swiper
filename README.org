@@ -138,7 +138,8 @@ is taking place.
        threshold: 175, // in centimeters
        distanceDiff: 1.25, // difference between both sensors
        debug: false, // if true, the raw data is printed to stdout while MagicMirror is running
-       delay: 1000, // time between passing data from C executable to the node_helper in milliseconds
+       magicMirrorDelay: 1000, // number of milliseconds between passing data from C executable to the node_helper for MagicMirror to act upon
+       sensorDelay: 10, // the number of microseconds each sensor waits to check for changes in voltage (fine tune this for CPU performance)
    }
 
 // other module configs ...

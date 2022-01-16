@@ -10,15 +10,6 @@
 | Otto Juba       | ottojuba@gmail.com                |
 
 ** What is this, and why did we make this module?
-   When setting up our MagicMirrors, we wanted to use two HC-SR04 ultra
-   sonic sensors to detect motion, so we could change the currently
-   displayed page, and feel like wizards who commanded technology using
-   mystical powers (bad joke, I know). When searching through the modules
-   available on the MagicMirror wiki, we found a couple of pre-existing
-   modules built to do just that, but none of them worked. So, we
-   searched online for answers, and found many people having the same
-   issue with the very same modules. So, we decided to make our own.
-
    This module attempts to determine distance/motion based on the output
    from the sensors in a simple, efficient manner. When the
    =MMM-Simple-Swiper= modules loads, it sends a socket notification to
@@ -35,12 +26,6 @@
    criteria and there is a large enough difference between the two
    values, a socket nofication is sent to the =MMM-Simple-Swiper= module,
    which sends a notification to the =MMM-pages= module.
-
-   The overwhelming majority of the work is done on the C-side (get it?
-   It's a pun. "Bazinga" - Sheldon Cooper) of things to keep it fast and
-   efficient. Also, we tried to keep it as lightweight as possible (280
-   lines of code...including the Makefile), so the code is (hopefully)
-   pretty straightforward.
 
 ** Dependencies
    This module has three dependencies, all of which are listed in the
@@ -82,8 +67,6 @@ $ cd ~/MagicMirror/modules/MMM-Simple-Swiper && make
 Be sure to add the snippet for your =config.js= file below.
 
 ** SuDON'T
-
-   [[./images/checkurpriv.jpg]]
 
    When running this module, there is absolutely no need to execute
    =sudo= with =npm start=. This is due to the small hack (I guess it can
